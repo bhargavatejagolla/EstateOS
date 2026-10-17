@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 
-export const healthRouter = Router();
+export const healthRouter: Router = Router();
 
 healthRouter.get("/health", async (_req, res) => {
   try {

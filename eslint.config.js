@@ -5,7 +5,7 @@ import prettier from "eslint-config-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
-  { ignores: ["**/dist/**", "**/node_modules/**", "**/generated/**"] },
+  { ignores: ["**/dist/**", "**/node_modules/**", "**/generated/**", "**/*.config.*"] },
   js.configs.recommended,
   {
     files: ["**/*.{ts,tsx}"],
@@ -17,6 +17,7 @@ export default [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      "no-undef": "off",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/consistent-type-imports": "error",
     },
