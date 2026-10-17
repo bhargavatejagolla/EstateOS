@@ -3,16 +3,22 @@ info:
   title: EstateOS API
   version: 0.1.0
   description: Phase 1 contract — health check only. Auth in Phase 2, properties in Phase 2, etc.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 
 servers:
   - url: http://localhost:4000/api
+    description: Local API Server
 
 paths:
   /health:
     get:
       tags: [System]
       summary: Health check
+      operationId: getHealthStatus
       description: Returns 200 if the API can reach the database.
+      security: []
       responses:
         "200":
           description: Healthy
@@ -25,6 +31,20 @@ paths:
                   status: { type: string, enum: [ok] }
                   db: { type: string, enum: [connected] }
                   timestamp: { type: string, format: date-time }
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [error]
+                properties:
+                  error:
+                    type: object
+                    required: [code, message]
+                    properties:
+                      code: { type: string }
+                      message: { type: string }
         "503":
           description: Degraded — DB unreachable
           content:
