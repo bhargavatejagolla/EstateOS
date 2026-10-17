@@ -26,3 +26,29 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
     throw new UnauthorizedError("Invalid or expired access token");
   }
 }
+
+export function optionalAuthenticate(req: Request, _res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next();
+  }
+
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const payload = TokenService.verifyAccessToken(token);
+    req.user = {
+      id: payload.id,
+      email: payload.email,
+      role: payload.role,
+    };
+  } catch {
+    // Ignore invalid token in optional auth
+  }
+
+  next();
+}

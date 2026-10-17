@@ -46,6 +46,8 @@ export const PropertyCreateSchema = z.object({
   furnishing: FurnishingEnum,
   amenities: z.array(z.string()).default([]),
   availability: AvailabilityEnum.default("AVAILABLE_NOW"),
+  latitude: z.coerce.number().optional(),
+  longitude: z.coerce.number().optional(),
 });
 
 export const PropertyUpdateSchema = PropertyCreateSchema.partial().extend({
@@ -66,8 +68,39 @@ export const PropertyResponseSchema = PropertyCreateSchema.extend({
   ownerId: z.string(),
   status: PropertyStatusEnum,
   images: z.array(PropertyImageSchema),
+  owner: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string().email(),
+      phone: z.string().nullable().optional(),
+    })
+    .optional(),
+  isFavourited: z.boolean().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+});
+
+export const PropertySearchQuerySchema = z.object({
+  city: z.string().optional(),
+  locality: z.string().optional(),
+  propertyType: PropertyTypeEnum.optional(),
+  furnishing: FurnishingEnum.optional(),
+  bedrooms: z.coerce.number().int().min(0).optional(),
+  minPrice: z.coerce.number().nonnegative().optional(),
+  maxPrice: z.coerce.number().nonnegative().optional(),
+  q: z.string().optional(),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(12),
+  sortBy: z.enum(["price_asc", "price_desc", "newest"]).default("newest"),
+});
+
+export const PropertyListResponseSchema = z.object({
+  properties: z.array(PropertyResponseSchema),
+  total: z.number().int(),
+  page: z.number().int(),
+  limit: z.number().int(),
+  totalPages: z.number().int(),
 });
 
 export type PropertyType = z.infer<typeof PropertyTypeEnum>;
@@ -78,3 +111,5 @@ export type PropertyCreate = z.infer<typeof PropertyCreateSchema>;
 export type PropertyUpdate = z.infer<typeof PropertyUpdateSchema>;
 export type PropertyImage = z.infer<typeof PropertyImageSchema>;
 export type PropertyResponse = z.infer<typeof PropertyResponseSchema>;
+export type PropertySearchQuery = z.infer<typeof PropertySearchQuerySchema>;
+export type PropertyListResponse = z.infer<typeof PropertyListResponseSchema>;

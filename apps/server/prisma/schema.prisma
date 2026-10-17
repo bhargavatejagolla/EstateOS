@@ -43,6 +43,24 @@ enum Availability {
   NOT_AVAILABLE
 }
 
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  VISIT_SCHEDULED
+  NEGOTIATING
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum AppointmentStatus {
+  PROPOSED
+  CONFIRMED
+  RESCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -56,6 +74,8 @@ model User {
 
   refreshTokens   RefreshToken[]
   propertiesOwned Property[]     @relation("PropertyOwner")
+  favourites      Favourite[]
+  enquiries       Enquiry[]
 
   @@index([role])
 }
@@ -94,10 +114,15 @@ model Property {
   amenities     String[]       @default([])
   status        PropertyStatus @default(DRAFT)
   availability  Availability   @default(AVAILABLE_NOW)
+  latitude      Float?
+  longitude     Float?
+  deletedAt     DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  images PropertyImage[]
+  images     PropertyImage[]
+  favourites Favourite[]
+  enquiries  Enquiry[]
 
   @@index([ownerId])
   @@index([city, locality])
@@ -119,4 +144,52 @@ model PropertyImage {
   createdAt  DateTime @default(now())
 
   @@index([propertyId])
+}
+
+model Favourite {
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+}
+
+model Enquiry {
+  id         String        @id @default(cuid())
+  userId     String
+  propertyId String
+  message    String
+  status     EnquiryStatus @default(NEW)
+  ownerNotes String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property     Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([status])
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  enquiryId String
+  visitAt   DateTime
+  status    AppointmentStatus @default(PROPOSED)
+  notes     String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  enquiry Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+
+  @@index([enquiryId])
+  @@index([status])
+  @@index([visitAt])
 }

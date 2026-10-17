@@ -126,10 +126,11 @@ export class AuthService {
 
     // Replay attack detection: token missing or already revoked
     if (!storedToken || storedToken.revokedAt !== null) {
-      if (storedToken?.userId) {
+      const compromisedUserId = storedToken?.userId || payload.id;
+      if (compromisedUserId) {
         // Revoke all tokens for this compromised session
         await prisma.refreshToken.updateMany({
-          where: { userId: storedToken.userId },
+          where: { userId: compromisedUserId },
           data: { revokedAt: new Date() },
         });
       }

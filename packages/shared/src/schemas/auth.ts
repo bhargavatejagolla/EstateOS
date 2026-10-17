@@ -30,3 +30,6 @@ export type RegisterInput = z.infer<typeof RegisterInputSchema>;
 export type LoginInput = z.infer<typeof LoginInputSchema>;
 export type AuthUser = z.infer<typeof AuthUserSchema>;
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+export const UserPublicSchema = AuthUserSchema;
+export type UserPublic = AuthUser;
+

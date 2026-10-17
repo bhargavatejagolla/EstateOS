@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: EstateOS API
-  version: 0.1.0
-  description: Phase 1 contract — health check only. Auth in Phase 2, properties in Phase 2, etc.
+  version: 0.2.0
+  description: Phase 2 contract — Authentication, RBAC, Property CRUD, and Cloudinary media uploads.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -32,19 +32,7 @@ paths:
                   db: { type: string, enum: [connected] }
                   timestamp: { type: string, format: date-time }
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [error]
-                properties:
-                  error:
-                    type: object
-                    required: [code, message]
-                    properties:
-                      code: { type: string }
-                      message: { type: string }
+          $ref: "#/components/responses/BadRequestError"
         "503":
           description: Degraded — DB unreachable
           content:
@@ -55,3 +43,383 @@ paths:
                 properties:
                   status: { type: string, enum: [degraded] }
                   db: { type: string, enum: [disconnected] }
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 100 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8, maxLength: 128 }
+                role: { type: string, enum: [OWNER, RENTER], default: RENTER }
+                phone: { type: [string, "null"] }
+      responses:
+        "201":
+          description: User registered successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                description: HttpOnly refresh token cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "409":
+          description: Email already in use
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate user & return tokens
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200":
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate and refresh access token
+      operationId: refreshToken
+      security: []
+      responses:
+        "200":
+          description: Tokens refreshed and rotated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Revoke session and clear refresh cookie
+      operationId: logoutUser
+      security: []
+      responses:
+        "204":
+          description: Logged out successfully
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get currently authenticated user profile
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPublic"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /properties:
+    post:
+      tags: [Properties]
+      summary: Create property listing (OWNER only)
+      operationId: createProperty
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PropertyCreate"
+      responses:
+        "201":
+          description: Property created
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /properties/mine:
+    get:
+      tags: [Properties]
+      summary: List owner's properties
+      operationId: listMyProperties
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of properties
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /properties/{id}:
+    get:
+      tags: [Properties]
+      summary: Get property details by ID
+      operationId: getPropertyById
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Property found
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    put:
+      tags: [Properties]
+      summary: Update property listing (Owner only)
+      operationId: updateProperty
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Property updated
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    delete:
+      tags: [Properties]
+      summary: Soft-delete property listing (Owner only)
+      operationId: deleteProperty
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Property deleted
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /properties/{id}/images:
+    post:
+      tags: [Properties]
+      summary: Upload photo to Cloudinary
+      operationId: uploadPropertyImage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Image uploaded
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /properties/{id}/images/{imageId}:
+    delete:
+      tags: [Properties]
+      summary: Delete photo from Cloudinary
+      operationId: deletePropertyImage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: imageId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Image deleted
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequestError:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnauthorizedError:
+      description: Authentication required or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ForbiddenError:
+      description: Insufficient permissions or ownership mismatch
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ValidationError:
+      description: Input validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    UserPublic:
+      type: object
+      required: [id, name, email, role]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { type: string, enum: [ADMIN, OWNER, TENANT, RENTER] }
+        phone: { type: [string, "null"] }
+
+    AuthResponse:
+      type: object
+      required: [user, accessToken]
+      properties:
+        user: { $ref: "#/components/schemas/UserPublic" }
+        accessToken: { type: string }
+
+    PropertyCreate:
+      type: object
+      required: [title, description, price, city, locality, address, propertyType, bedrooms, bathrooms, areaSqft, furnishing]
+      properties:
+        title: { type: string, minLength: 5, maxLength: 200 }
+        description: { type: string, minLength: 20, maxLength: 5000 }
+        price: { type: number, minimum: 1 }
+        depositAmount: { type: [number, "null"] }
+        city: { type: string }
+        locality: { type: string }
+        address: { type: string }
+        pincode: { type: [string, "null"] }
+        propertyType: { type: string, enum: [APARTMENT, HOUSE, VILLA, STUDIO, PLOT, COMMERCIAL] }
+        bedrooms: { type: integer, minimum: 0, maximum: 20 }
+        bathrooms: { type: integer, minimum: 0, maximum: 20 }
+        areaSqft: { type: integer, minimum: 1 }
+        furnishing: { type: string, enum: [UNFURNISHED, SEMI_FURNISHED, FULLY_FURNISHED] }
+        amenities: { type: array, items: { type: string } }
+        availability: { type: string, enum: [AVAILABLE_NOW, AVAILABLE_SOON, NOT_AVAILABLE], default: AVAILABLE_NOW }
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            details: { type: [object, "null"] }

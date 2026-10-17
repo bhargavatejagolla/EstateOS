@@ -7,6 +7,31 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: estateos_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/estateos_test?schema=public
+      DATABASE_URL_TEST: postgresql://test:test@localhost:5432/estateos_test?schema=public
+      JWT_ACCESS_SECRET: ci_access_secret_64_chars_0000000000000000000000000000000000000
+      JWT_REFRESH_SECRET: ci_refresh_secret_64_chars_000000000000000000000000000000000000
+      CLOUDINARY_CLOUD_NAME: ci_dummy
+      CLOUDINARY_API_KEY: ci_dummy
+      CLOUDINARY_API_SECRET: ci_dummy
+      CLIENT_ORIGIN: http://localhost:5173
+      NODE_ENV: test
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,8 +52,9 @@ jobs:
 
       - name: Generate Prisma client
         run: pnpm --filter server prisma:generate
-        env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
+
+      - name: Apply migrations to test DB
+        run: pnpm --filter server exec prisma migrate deploy
 
       - name: Lint
         run: pnpm lint
@@ -36,5 +62,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Run Integration Tests
+        run: pnpm --filter server test
+
       - name: Build all packages
         run: pnpm build
+
+      - name: OpenAPI lint
+        run: pnpm --package=@redocly/cli dlx redocly lint docs/openapi.yaml

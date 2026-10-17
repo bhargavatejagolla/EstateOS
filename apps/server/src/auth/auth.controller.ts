@@ -4,7 +4,7 @@ import { AuthService } from "./auth.service.js";
 import { env } from "../config/env.js";
 import { UnauthorizedError } from "../middleware/errors.js";
 
-const COOKIE_NAME = "refreshToken";
+const COOKIE_NAME = "refresh_token";
 
 function setRefreshCookie(res: Response, token: string): void {
   res.cookie(COOKIE_NAME, token, {

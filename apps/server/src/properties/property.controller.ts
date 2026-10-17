@@ -1,5 +1,9 @@
 import type { Request, Response } from "express";
-import { PropertyCreateSchema, PropertyUpdateSchema } from "@estateos/shared";
+import {
+  PropertyCreateSchema,
+  PropertyUpdateSchema,
+  PropertySearchQuerySchema,
+} from "@estateos/shared";
 import { PropertyService } from "./property.service.js";
 import { BadRequestError, UnauthorizedError } from "../middleware/errors.js";
 
@@ -12,6 +16,12 @@ function getParam(param: string | string[] | undefined, name: string): string {
 }
 
 export class PropertyController {
+  static async search(req: Request, res: Response): Promise<void> {
+    const query = PropertySearchQuerySchema.parse(req.query);
+    const result = await PropertyService.search(query, req.user?.id);
+    res.status(200).json(result);
+  }
+
   static async create(req: Request, res: Response): Promise<void> {
     if (!req.user) {
       throw new UnauthorizedError("Authentication required");
@@ -34,7 +44,17 @@ export class PropertyController {
 
   static async getById(req: Request, res: Response): Promise<void> {
     const id = getParam(req.params.id, "id");
-    const property = await PropertyService.getById(id);
+    const property = await PropertyService.getById(id, req.user?.id);
+    res.status(200).json(property);
+  }
+
+  static async publish(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Authentication required");
+    }
+
+    const id = getParam(req.params.id, "id");
+    const property = await PropertyService.publish(id, req.user.id, req.user.role);
     res.status(200).json(property);
   }
 

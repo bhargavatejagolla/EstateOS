@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { PropertyController } from "./property.controller.js";
-import { authenticate } from "../middleware/authenticate.js";
+import { authenticate, optionalAuthenticate } from "../middleware/authenticate.js";
 import { authorizeRoles, authorizeOwnership } from "../middleware/authorize.js";
 
 const upload = multer({
@@ -19,6 +19,9 @@ const upload = multer({
 
 export const propertyRouter: Router = Router();
 
+// Public marketplace property search with optional authentication (for isFavourited)
+propertyRouter.get("/", optionalAuthenticate, PropertyController.search);
+
 // Create property (Owner/Admin only)
 propertyRouter.post(
   "/",
@@ -35,8 +38,16 @@ propertyRouter.get(
   PropertyController.getMine
 );
 
-// Public get by ID
-propertyRouter.get("/:id", PropertyController.getById);
+// Public get by ID (with optional auth for isFavourited)
+propertyRouter.get("/:id", optionalAuthenticate, PropertyController.getById);
+
+// Publish / unpublish property (Owner or Admin)
+propertyRouter.patch(
+  "/:id/publish",
+  authenticate,
+  authorizeRoles("OWNER", "ADMIN"),
+  PropertyController.publish
+);
 
 // Update property (Owner with ownership check)
 propertyRouter.put(
@@ -59,7 +70,7 @@ propertyRouter.post(
   "/:id/images",
   authenticate,
   authorizeOwnership,
-  upload.single("file"),
+  upload.single("image"),
   PropertyController.uploadImage
 );
 
