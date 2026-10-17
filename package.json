@@ -1,0 +1,26 @@
+{
+  "name": "estateos-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "EstateOS - Full-Lifecycle Rental Operations & Property Management Platform",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:server": "pnpm --filter @estateos/server dev",
+    "dev:client": "pnpm --filter @estateos/client dev",
+    "build": "pnpm --filter @estateos/shared build && pnpm --filter @estateos/server build && pnpm --filter @estateos/client build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
+    "db:generate": "pnpm --filter @estateos/server db:generate",
+    "db:migrate": "pnpm --filter @estateos/server db:migrate",
+    "db:studio": "pnpm --filter @estateos/server db:studio"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "eslint": "^9.20.0",
+    "prettier": "^3.5.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
+  }
+}
