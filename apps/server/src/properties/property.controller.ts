@@ -1,0 +1,70 @@
+import type { Request, Response } from "express";
+import { PropertyCreateSchema, PropertyUpdateSchema } from "@estateos/shared";
+import { PropertyService } from "./property.service.js";
+import { BadRequestError, UnauthorizedError } from "../middleware/errors.js";
+
+function getParam(param: string | string[] | undefined, name: string): string {
+  const val = Array.isArray(param) ? param[0] : param;
+  if (!val) {
+    throw new BadRequestError(`Missing parameter: ${name}`);
+  }
+  return val;
+}
+
+export class PropertyController {
+  static async create(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Authentication required");
+    }
+
+    const input = PropertyCreateSchema.parse(req.body);
+    const property = await PropertyService.create(req.user.id, input);
+
+    res.status(201).json(property);
+  }
+
+  static async getMine(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Authentication required");
+    }
+
+    const properties = await PropertyService.getMyProperties(req.user.id);
+    res.status(200).json(properties);
+  }
+
+  static async getById(req: Request, res: Response): Promise<void> {
+    const id = getParam(req.params.id, "id");
+    const property = await PropertyService.getById(id);
+    res.status(200).json(property);
+  }
+
+  static async update(req: Request, res: Response): Promise<void> {
+    const id = getParam(req.params.id, "id");
+    const input = PropertyUpdateSchema.parse(req.body);
+    const property = await PropertyService.update(id, input);
+    res.status(200).json(property);
+  }
+
+  static async delete(req: Request, res: Response): Promise<void> {
+    const id = getParam(req.params.id, "id");
+    await PropertyService.delete(id);
+    res.status(204).send();
+  }
+
+  static async uploadImage(req: Request, res: Response): Promise<void> {
+    const id = getParam(req.params.id, "id");
+    if (!req.file) {
+      throw new BadRequestError("No image file provided");
+    }
+
+    const image = await PropertyService.addImage(id, req.file.buffer);
+    res.status(201).json(image);
+  }
+
+  static async deleteImage(req: Request, res: Response): Promise<void> {
+    const id = getParam(req.params.id, "id");
+    const imageId = getParam(req.params.imageId, "imageId");
+    await PropertyService.deleteImage(id, imageId);
+    res.status(204).send();
+  }
+}
