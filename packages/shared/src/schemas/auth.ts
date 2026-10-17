@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const RoleEnum = z.enum(["ADMIN", "OWNER", "TENANT", "RENTER"]);
+export type Role = z.infer<typeof RoleEnum>;
+
 export const RegisterInputSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().email("Invalid email address"),
@@ -17,7 +20,7 @@ export const AuthUserSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string().email(),
-  role: z.enum(["ADMIN", "OWNER", "TENANT", "RENTER"]),
+  role: RoleEnum,
   phone: z.string().nullable().optional(),
 });
 
@@ -32,4 +35,3 @@ export type AuthUser = z.infer<typeof AuthUserSchema>;
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
 export const UserPublicSchema = AuthUserSchema;
 export type UserPublic = AuthUser;
-

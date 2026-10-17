@@ -10,9 +10,7 @@ import {
   Heart,
   Clock,
   MapPin,
-  CheckCircle2,
   Trash2,
-  Building2,
   ArrowRight,
 } from "lucide-react";
 

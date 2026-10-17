@@ -36,7 +36,6 @@ export default function PropertyDetailPage() {
   );
   const [existingEnquiry, setExistingEnquiry] = useState<EnquiryResponse | null>(null);
   const [enquiryLoading, setEnquiryLoading] = useState(false);
-  const [enquirySuccess, setEnquirySuccess] = useState(false);
 
   // Visit scheduling state
   const [visitDate, setVisitDate] = useState("");
@@ -51,8 +50,9 @@ export default function PropertyDetailPage() {
     try {
       const data = await api.get<PropertyResponse>(`/api/properties/${id}`);
       setProperty(data);
-      if (data.images && data.images.length > 0) {
-        setSelectedImage(data.images[0].url);
+      const firstImg = data.images?.[0];
+      if (firstImg) {
+        setSelectedImage(firstImg.url);
       }
     } catch {
       setError("Property not found or unavailable");
@@ -65,8 +65,9 @@ export default function PropertyDetailPage() {
     if (!user || user.role !== "RENTER" || !id) return;
     try {
       const enquiries = await api.get<EnquiryResponse[]>(`/api/enquiries?propertyId=${id}`);
-      if (enquiries && enquiries.length > 0) {
-        setExistingEnquiry(enquiries[0]);
+      const firstEnq = enquiries?.[0];
+      if (firstEnq) {
+        setExistingEnquiry(firstEnq);
       }
     } catch {
       // Ignore if not found
@@ -115,7 +116,6 @@ export default function PropertyDetailPage() {
         message: enquiryMessage,
       });
       setExistingEnquiry(res);
-      setEnquirySuccess(true);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to send enquiry";
       setError(msg);
@@ -376,7 +376,9 @@ export default function PropertyDetailPage() {
                   <div>
                     <h4 className="text-sm font-semibold text-white flex items-center gap-1.5">
                       {property.owner.name}
-                      <ShieldCheck className="h-4 w-4 text-emerald-400" title="Verified Owner" />
+                      <span title="Verified Owner">
+                        <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                      </span>
                     </h4>
                     <p className="text-xs text-slate-400">{property.owner.email}</p>
                   </div>
