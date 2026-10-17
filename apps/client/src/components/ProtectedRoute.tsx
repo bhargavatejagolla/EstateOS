@@ -1,13 +1,15 @@
 import React, { type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router";
 import { useAuth } from "../lib/auth.js";
+import type { Role } from "@estateos/shared";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  role?: "OWNER" | "RENTER" | "ADMIN" | "TENANT";
+  role?: Role;
+  roles?: Role[];
 }
 
-export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, role, roles }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -27,6 +29,10 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   }
 
   if (role && user.role !== role && user.role !== "ADMIN") {
+    return <Navigate to="/" replace />;
+  }
+
+  if (roles && !roles.includes(user.role as Role) && user.role !== "ADMIN") {
     return <Navigate to="/" replace />;
   }
 

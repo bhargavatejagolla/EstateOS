@@ -7,21 +7,27 @@ export const setAccessToken = (token: string | null) => {
 export const getAccessToken = () => accessToken;
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const normalizedPath = path.startsWith("/api") ? path : `/api${path.startsWith("/") ? "" : "/"}${path}`;
+
   const headers = new Headers(options.headers);
   if (accessToken) {
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
-  if (!(options.body instanceof FormData)) {
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(normalizedPath, {
     ...options,
     headers,
     credentials: "include",
   });
 
-  if (res.status === 401 && !path.startsWith("/auth/login") && !path.startsWith("/auth/register")) {
+  if (
+    res.status === 401 &&
+    !normalizedPath.includes("/auth/login") &&
+    !normalizedPath.includes("/auth/register")
+  ) {
     // Attempt silent token refresh
     try {
       const refreshRes = await fetch("/api/auth/refresh", {
@@ -34,7 +40,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
         setAccessToken(data.accessToken);
         headers.set("Authorization", `Bearer ${data.accessToken}`);
 
-        const retryRes = await fetch(`/api${path}`, {
+        const retryRes = await fetch(normalizedPath, {
           ...options,
           headers,
           credentials: "include",
@@ -67,3 +73,30 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
 
   return (await res.json()) as T;
 }
+
+api.get = <T>(path: string, options: RequestInit = {}): Promise<T> =>
+  api<T>(path, { ...options, method: "GET" });
+
+api.post = <T>(path: string, data?: unknown, options: RequestInit = {}): Promise<T> =>
+  api<T>(path, {
+    ...options,
+    method: "POST",
+    body: data instanceof FormData ? data : data !== undefined ? JSON.stringify(data) : undefined,
+  });
+
+api.put = <T>(path: string, data?: unknown, options: RequestInit = {}): Promise<T> =>
+  api<T>(path, {
+    ...options,
+    method: "PUT",
+    body: data instanceof FormData ? data : data !== undefined ? JSON.stringify(data) : undefined,
+  });
+
+api.patch = <T>(path: string, data?: unknown, options: RequestInit = {}): Promise<T> =>
+  api<T>(path, {
+    ...options,
+    method: "PATCH",
+    body: data instanceof FormData ? data : data !== undefined ? JSON.stringify(data) : undefined,
+  });
+
+api.delete = <T>(path: string, options: RequestInit = {}): Promise<T> =>
+  api<T>(path, { ...options, method: "DELETE" });
