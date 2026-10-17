@@ -1,22 +1,17 @@
-import { Router, Request, Response } from "express";
-import { prisma } from "../lib/prisma";
+import { Router } from "express";
+import { prisma } from "../lib/prisma.js";
 
 export const healthRouter = Router();
 
-healthRouter.get("/", async (_req: Request, res: Response) => {
-  let dbStatus = "disconnected";
+healthRouter.get("/health", async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    dbStatus = "connected";
-  } catch (error) {
-    dbStatus = "unavailable";
+    res.json({
+      status: "ok",
+      db: "connected",
+      timestamp: new Date().toISOString(),
+    });
+  } catch {
+    res.status(503).json({ status: "degraded", db: "disconnected" });
   }
-
-  res.status(200).json({
-    status: "ok",
-    service: "estateos-api",
-    timestamp: new Date().toISOString(),
-    uptimeSeconds: Math.floor(process.uptime()),
-    database: dbStatus,
-  });
 });

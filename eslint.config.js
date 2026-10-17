@@ -1,28 +1,25 @@
 import js from "@eslint/js";
-import tseslint from "typescript-eslint";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import prettier from "eslint-config-prettier";
+import reactHooks from "eslint-plugin-react-hooks";
 
-export default tseslint.config(
+export default [
+  { ignores: ["**/dist/**", "**/node_modules/**", "**/generated/**"] },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
-    ignores: [
-      "**/dist/**",
-      "**/node_modules/**",
-      "**/build/**",
-      "apps/server/prisma/generated/**",
-      "**/*.config.*"
-    ],
-  },
-  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { ecmaVersion: 2022, sourceType: "module" },
+    },
+    plugins: { "@typescript-eslint": tsPlugin, "react-hooks": reactHooks },
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        {
-          "argsIgnorePattern": "^_",
-          "varsIgnorePattern": "^_"
-        }
-      ]
-    }
-  }
-);
+      ...tsPlugin.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/consistent-type-imports": "error",
+    },
+  },
+  prettier,
+];

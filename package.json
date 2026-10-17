@@ -1,26 +1,23 @@
 {
-  "name": "estateos-monorepo",
-  "version": "1.0.0",
+  "name": "estateos",
+  "version": "0.1.0",
   "private": true,
-  "description": "EstateOS - Full-Lifecycle Rental Operations & Property Management Platform",
+  "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
-    "dev:server": "pnpm --filter @estateos/server dev",
-    "dev:client": "pnpm --filter @estateos/client dev",
-    "build": "pnpm --filter @estateos/shared build && pnpm --filter @estateos/server build && pnpm --filter @estateos/client build",
-    "typecheck": "pnpm -r run typecheck",
+    "dev:client": "pnpm --filter client dev",
+    "dev:server": "pnpm --filter server dev",
+    "build": "pnpm -r build",
     "lint": "eslint .",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
-    "db:generate": "pnpm --filter @estateos/server db:generate",
-    "db:migrate": "pnpm --filter @estateos/server db:migrate",
-    "db:studio": "pnpm --filter @estateos/server db:studio"
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
   },
   "devDependencies": {
-    "@eslint/js": "^9.20.0",
-    "eslint": "^9.20.0",
-    "prettier": "^3.5.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0"
+    "@typescript-eslint/eslint-plugin": "8.20.0",
+    "@typescript-eslint/parser": "8.20.0",
+    "eslint": "9.18.0",
+    "eslint-config-prettier": "10.0.1",
+    "eslint-plugin-react-hooks": "5.1.0",
+    "prettier": "3.4.2",
+    "typescript": "5.9.3"
   }
 }

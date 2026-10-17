@@ -1,44 +1,20 @@
-# Dependencies
 node_modules/
-.pnp
-.pnp.js
-
-# Testing & Coverage
-coverage/
-playwright-report/
-test-results/
-
-# Production Builds
 dist/
 build/
-.next/
-out/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+coverage/
 *.log
 
-# Editor & OS files
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.DS_Store
-Thumbs.db
+.env
+.env.*
+!.env.example
 
-# Database
-prisma/*.db
-prisma/*.db-journal
+apps/server/prisma/*.db
+apps/server/prisma/*.db-journal
+
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.playwright/
+playwright-report/
+test-results/
