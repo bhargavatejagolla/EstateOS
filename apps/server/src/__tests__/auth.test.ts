@@ -27,13 +27,13 @@ describe("Auth", () => {
 
   it("rejects duplicate email with 409", async () => {
     await request(app).post("/api/auth/register").send({
-      name: "A",
+      name: "User A",
       email: "dup@test.com",
       password: "password123",
       role: "RENTER",
     });
     const res = await request(app).post("/api/auth/register").send({
-      name: "B",
+      name: "User B",
       email: "dup@test.com",
       password: "password123",
       role: "RENTER",
@@ -43,7 +43,7 @@ describe("Auth", () => {
 
   it("rejects wrong password with 401", async () => {
     await request(app).post("/api/auth/register").send({
-      name: "U",
+      name: "User U",
       email: "u@test.com",
       password: "password123",
       role: "RENTER",
@@ -57,7 +57,7 @@ describe("Auth", () => {
 
   it("rotates refresh tokens on /refresh", async () => {
     const reg = await request(app).post("/api/auth/register").send({
-      name: "R",
+      name: "User R",
       email: "r@test.com",
       password: "password123",
       role: "OWNER",
