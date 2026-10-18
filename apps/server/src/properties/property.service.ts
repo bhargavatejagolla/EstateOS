@@ -157,7 +157,7 @@ export class PropertyService {
     const limit = query.limit || 12;
     const skip = (page - 1) * limit;
 
-    const [total, rawProperties] = await prisma.$transaction([
+    const [total, rawProperties] = await Promise.all([
       prisma.property.count({ where }),
       prisma.property.findMany({
         where,
