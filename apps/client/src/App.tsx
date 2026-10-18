@@ -10,6 +10,13 @@ import OwnerDashboard from "./pages/OwnerDashboard.js";
 import RenterDashboard from "./pages/RenterDashboard.js";
 import NewPropertyPage from "./pages/NewPropertyPage.js";
 import FavouritesPage from "./pages/FavouritesPage.js";
+import TenantDashboard from "./pages/TenantDashboard.js";
+import LeaseDetailPage from "./pages/LeaseDetailPage.js";
+import OwnerLeasesPage from "./pages/OwnerLeasesPage.js";
+import CreateLeasePage from "./pages/CreateLeasePage.js";
+import OwnerLeaseDetailPage from "./pages/OwnerLeaseDetailPage.js";
+import OwnerMaintenancePage from "./pages/OwnerMaintenancePage.js";
+import RecommendationsPage from "./pages/RecommendationsPage.js";
 
 export function App() {
   return (
@@ -33,7 +40,7 @@ export function App() {
           <Route
             path="/renter/dashboard"
             element={
-              <ProtectedRoute roles={["RENTER", "ADMIN"]}>
+              <ProtectedRoute roles={["RENTER", "TENANT", "ADMIN"]}>
                 <RenterDashboard />
               </ProtectedRoute>
             }
@@ -41,8 +48,34 @@ export function App() {
           <Route
             path="/favourites"
             element={
-              <ProtectedRoute roles={["RENTER", "OWNER", "ADMIN"]}>
+              <ProtectedRoute roles={["RENTER", "TENANT", "OWNER", "ADMIN"]}>
                 <FavouritesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute roles={["RENTER", "TENANT", "ADMIN"]}>
+                <RecommendationsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Tenant Routes */}
+          <Route
+            path="/tenant/dashboard"
+            element={
+              <ProtectedRoute roles={["TENANT", "RENTER", "ADMIN"]}>
+                <TenantDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tenant/leases/:id"
+            element={
+              <ProtectedRoute roles={["TENANT", "RENTER", "ADMIN", "OWNER"]}>
+                <LeaseDetailPage />
               </ProtectedRoute>
             }
           />
@@ -65,6 +98,40 @@ export function App() {
             }
           />
 
+          {/* Owner Leases & Operations */}
+          <Route
+            path="/owner/leases"
+            element={
+              <ProtectedRoute roles={["OWNER", "ADMIN"]}>
+                <OwnerLeasesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/leases/new"
+            element={
+              <ProtectedRoute roles={["OWNER", "ADMIN"]}>
+                <CreateLeasePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/leases/:id"
+            element={
+              <ProtectedRoute roles={["OWNER", "ADMIN"]}>
+                <OwnerLeaseDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/maintenance"
+            element={
+              <ProtectedRoute roles={["OWNER", "ADMIN"]}>
+                <OwnerMaintenancePage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Fallback */}
           <Route path="*" element={<MarketplacePage />} />
         </Routes>
@@ -77,10 +144,10 @@ export function App() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Marketplace Operational
+              Platform Active & Operational
             </span>
             <span>•</span>
-            <span>Phase 3: The Funnel</span>
+            <span>Phase 5: Rental Reliability Engine & Analytics</span>
           </div>
         </div>
       </footer>

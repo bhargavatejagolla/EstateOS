@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: EstateOS API
-  version: 0.3.0
-  description: Phase 3 contract — Marketplace Discovery, Saved Homes, Enquiries Funnel, and Visit Appointments.
+  version: 0.5.0
+  description: Phase 5 contract — Rental Reliability Engine, Explainable Recommendations, Yield & Operational Analytics.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -662,6 +662,504 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundError"
 
+  /leases:
+    post:
+      tags: [Leases]
+      summary: Create a lease (Owner)
+      operationId: createLease
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseCreate"
+      responses:
+        "201":
+          description: Lease created with initial obligations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "409":
+          description: Overlapping active lease
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    get:
+      tags: [Leases]
+      summary: List user leases (Owner or Tenant)
+      operationId: getLeases
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of accessible leases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaseResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /leases/{id}:
+    get:
+      tags: [Leases]
+      summary: Get lease by ID
+      operationId: getLeaseById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Lease details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaseResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    patch:
+      tags: [Leases]
+      summary: Update lease status (Owner)
+      operationId: updateLeaseStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseStatusUpdate"
+      responses:
+        "200":
+          description: Lease status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /leases/{id}/accept:
+    post:
+      tags: [Leases]
+      summary: Electronically accept a lease (Tenant)
+      operationId: acceptLease
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseAccept"
+      responses:
+        "200":
+          description: Lease accepted and locked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /leases/{id}/obligations:
+    get:
+      tags: [Leases]
+      summary: Get rent obligations with derived payment status
+      operationId: getLeaseObligations
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Computed rent obligations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RentObligationResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /payments:
+    post:
+      tags: [Payments]
+      summary: Record a rent payment with FIFO allocation (Owner)
+      operationId: recordPayment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreate"
+      responses:
+        "201":
+          description: Payment recorded and allocated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    get:
+      tags: [Payments]
+      summary: List recorded payments
+      operationId: getPayments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: leaseId
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Payment list with allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PaymentResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /maintenance:
+    post:
+      tags: [Maintenance]
+      summary: Submit a maintenance ticket (Tenant)
+      operationId: createMaintenance
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaintenanceCreate"
+      responses:
+        "201":
+          description: Maintenance ticket created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+    get:
+      tags: [Maintenance]
+      summary: List maintenance requests
+      operationId: getMaintenanceList
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: propertyId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [REPORTED, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, CANCELLED]
+      responses:
+        "200":
+          description: Filtered maintenance tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaintenanceResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /maintenance/{id}:
+    get:
+      tags: [Maintenance]
+      summary: Get maintenance ticket with audit log
+      operationId: getMaintenanceById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Maintenance ticket details with full update history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    patch:
+      tags: [Maintenance]
+      summary: Update maintenance ticket status with note (Owner)
+      operationId: updateMaintenanceStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaintenanceStatusUpdate"
+      responses:
+        "200":
+          description: Ticket status updated with immutable update logged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Get user notifications with unread count
+      operationId: getNotifications
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: User notification inbox
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationListResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /notifications/read-all:
+    patch:
+      tags: [Notifications]
+      summary: Mark all notifications as read
+      operationId: markAllNotificationsRead
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /notifications/{id}/read:
+    patch:
+      tags: [Notifications]
+      summary: Mark single notification as read
+      operationId: markNotificationRead
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Notification marked read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /dashboard/owner:
+    get:
+      tags: [Dashboard]
+      summary: Get Owner Dashboard Signals & Intelligence
+      operationId: getOwnerDashboard
+      description: Returns occupancy, collection rate, income trend, audit logs, and priority-ranked signals.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Owner dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerDashboardResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /dashboard/tenant:
+    get:
+      tags: [Dashboard]
+      summary: Get Tenant Dashboard
+      operationId: getTenantDashboard
+      description: Returns tenant active lease, next upcoming obligation, and maintenance status.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Tenant dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TenantDashboardResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /recommendations:
+    get:
+      tags: [Recommendations]
+      summary: Get Explainable Property Recommendations
+      operationId: getRecommendations
+      description: Returns content-based recommendations derived strictly from user's favourites and enquiries.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Recommendations response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationsResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /properties/{id}/yield:
+    get:
+      tags: [Properties]
+      summary: Get Gross Rental Yield Estimate
+      operationId: getPropertyYield
+      description: Calculates gross yield against locality median active lease benchmarks with mandatory disclaimer.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Yield estimate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/YieldEstimate"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /properties/map:
+    get:
+      tags: [Properties]
+      summary: Get Geo Pins for Map View
+      operationId: getPropertyMapPins
+      description: Returns lightweight coordinate and price payload for active listings.
+      responses:
+        "200":
+          description: Map pins
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [properties]
+                properties:
+                  properties:
+                    type: array
+                    items:
+                      type: object
+
 components:
   securitySchemes:
     BearerAuth:
@@ -800,6 +1298,237 @@ components:
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
         enquiry: { type: [object, "null"] }
+
+    LeaseCreate:
+      type: object
+      required: [propertyId, tenantId, startDate, endDate, rentAmount, dueDay]
+      properties:
+        propertyId: { type: string }
+        tenantId: { type: string }
+        enquiryId: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: string, format: date-time }
+        rentAmount: { type: number, minimum: 1 }
+        depositAmount: { type: number, minimum: 0 }
+        dueDay: { type: integer, minimum: 1, maximum: 28 }
+        documentUrl: { type: string, format: uri }
+
+    LeaseAccept:
+      type: object
+      required: [acceptedByName]
+      properties:
+        acceptedByName: { type: string, minLength: 2, maxLength: 100 }
+        signatureDataUrl: { type: string }
+
+    LeaseStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [PENDING_ACCEPTANCE, ACTIVE, ENDED, TERMINATED]
+        endDate:
+          type: string
+          format: date-time
+
+    LeaseResponse:
+      type: object
+      required: [id, propertyId, tenantId, startDate, endDate, rentAmount, dueDay, status, acceptanceStatus, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        propertyId: { type: string }
+        tenantId: { type: string }
+        enquiryId: { type: [string, "null"] }
+        startDate: { type: string, format: date-time }
+        endDate: { type: string, format: date-time }
+        rentAmount: { type: number }
+        depositAmount: { type: [number, "null"] }
+        dueDay: { type: integer }
+        status:
+          type: string
+          enum: [PENDING_ACCEPTANCE, ACTIVE, ENDED, TERMINATED]
+        acceptanceStatus:
+          type: string
+          enum: [NOT_SENT, SENT_TO_TENANT, ACCEPTED_BY_TENANT, DECLINED_BY_TENANT]
+        acceptedByName: { type: [string, "null"] }
+        acceptedByTenantAt: { type: [string, "null"], format: date-time }
+        signatureDataUrl: { type: [string, "null"] }
+        documentUrl: { type: [string, "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        property:
+          type: object
+          properties:
+            id: { type: string }
+            title: { type: string }
+            city: { type: string }
+            price: { type: number }
+            address: { type: string }
+            ownerId: { type: string }
+        tenant:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            email: { type: string, format: email }
+            phone: { type: [string, "null"] }
+
+    RentObligationResponse:
+      type: object
+      required: [id, leaseId, dueDate, amountDue, amountPaid, balance, status, daysOverdue]
+      properties:
+        id: { type: string }
+        leaseId: { type: string }
+        dueDate: { type: string, format: date-time }
+        amountDue: { type: number }
+        amountPaid: { type: number }
+        balance: { type: number }
+        status:
+          type: string
+          enum: [PENDING, PARTIAL, PAID, OVERDUE, WAIVED]
+        daysOverdue: { type: integer, minimum: 0 }
+
+    PaymentCreate:
+      type: object
+      required: [leaseId, amount, method]
+      properties:
+        leaseId: { type: string }
+        amount: { type: number, minimum: 1 }
+        paidAt: { type: string, format: date-time }
+        method:
+          type: string
+          enum: [UPI, BANK_TRANSFER, CHEQUE, CASH, CREDIT_CARD, DEBIT_CARD, OTHER]
+        reference: { type: string, maxLength: 200 }
+        notes: { type: string, maxLength: 1000 }
+
+    PaymentAllocationResponse:
+      type: object
+      required: [obligationId, amount]
+      properties:
+        id: { type: string }
+        obligationId: { type: string }
+        amount: { type: number }
+        dueDate: { type: string, format: date-time }
+
+    PaymentResponse:
+      type: object
+      required: [id, leaseId, amount, paidAt, method, allocations]
+      properties:
+        id: { type: string }
+        leaseId: { type: string }
+        amount: { type: number }
+        paidAt: { type: string, format: date-time }
+        method: { type: string }
+        reference: { type: [string, "null"] }
+        notes: { type: [string, "null"] }
+        allocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAllocationResponse"
+        createdAt: { type: string, format: date-time }
+
+    MaintenanceCreate:
+      type: object
+      required: [leaseId, title, description]
+      properties:
+        leaseId: { type: string }
+        title: { type: string, minLength: 5, maxLength: 200 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+          default: MEDIUM
+        imageUrl: { type: string, format: uri }
+
+    MaintenanceStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [REPORTED, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, CANCELLED]
+        note: { type: string, maxLength: 1000 }
+
+    MaintenanceUpdateEntry:
+      type: object
+      required: [id, newStatus, updatedBy, createdAt]
+      properties:
+        id: { type: string }
+        oldStatus:
+          type: [string, "null"]
+          enum: [REPORTED, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, CANCELLED, null]
+        newStatus:
+          type: string
+          enum: [REPORTED, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, CANCELLED]
+        note: { type: [string, "null"] }
+        updatedBy:
+          type: object
+          required: [id, name]
+          properties:
+            id: { type: string }
+            name: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    MaintenanceResponse:
+      type: object
+      required: [id, propertyId, tenantId, leaseId, title, description, status, priority, createdAt, ageInDays, updates]
+      properties:
+        id: { type: string }
+        propertyId: { type: string }
+        tenantId: { type: string }
+        leaseId: { type: string }
+        title: { type: string }
+        description: { type: string }
+        imageUrl: { type: [string, "null"] }
+        status:
+          type: string
+          enum: [REPORTED, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, CANCELLED]
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        resolvedAt: { type: [string, "null"], format: date-time }
+        ageInDays: { type: integer, minimum: 0 }
+        property:
+          type: object
+          properties:
+            id: { type: string }
+            title: { type: string }
+            city: { type: string }
+        tenant:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            email: { type: string }
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/MaintenanceUpdateEntry"
+
+    NotificationResponse:
+      type: object
+      required: [id, type, message, isRead, createdAt]
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        type:
+          type: string
+          enum: [ENQUIRY_RECEIVED, APPOINTMENT_REQUESTED, APPOINTMENT_CONFIRMED, LEASE_CREATED, LEASE_ACCEPTED, LEASE_ACTIVATED, PAYMENT_RECEIVED, RENT_OVERDUE, MAINTENANCE_REQUESTED, MAINTENANCE_STATUS_CHANGED]
+        message: { type: string }
+        link: { type: [string, "null"] }
+        isRead: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    NotificationListResponse:
+      type: object
+      required: [notifications, unreadCount]
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotificationResponse"
+        unreadCount: { type: integer, minimum: 0 }
 
     ErrorResponse:
       type: object

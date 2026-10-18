@@ -14,6 +14,10 @@ import {
   RotateCcw,
   Building2,
   Sparkles,
+  Map as MapIcon,
+  LayoutGrid,
+  Navigation,
+  ArrowRight,
 } from "lucide-react";
 
 export default function MarketplacePage() {
@@ -23,6 +27,8 @@ export default function MarketplacePage() {
   const [properties, setProperties] = useState<PropertyResponse[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
 
   // Filters state
   const [city, setCity] = useState("");
@@ -246,7 +252,7 @@ export default function MarketplacePage() {
       )}
 
       {/* Results Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-xl font-bold text-white">Available Homes</h2>
           <p className="text-xs text-slate-400">
@@ -254,21 +260,52 @@ export default function MarketplacePage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-400">Sort by:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
-          >
-            <option value="newest">Newly Listed</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-          </select>
+        <div className="flex items-center gap-3 text-xs">
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${
+                viewMode === "grid"
+                  ? "bg-emerald-500 text-slate-950 shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" /> Grid
+            </button>
+            <button
+              onClick={() => {
+                setViewMode("map");
+                if (!selectedPinId && properties[0]) {
+                  setSelectedPinId(properties[0].id);
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${
+                viewMode === "map"
+                  ? "bg-emerald-500 text-slate-950 shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <MapIcon className="h-3.5 w-3.5" /> Map View
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+            >
+              <option value="newest">Newly Listed</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Properties Grid */}
+      {/* Properties Display: Grid vs Map */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -292,7 +329,163 @@ export default function MarketplacePage() {
             Reset All Filters
           </button>
         </div>
+      ) : viewMode === "map" ? (
+        /* Map View Mode: Split Map Canvas & Selected Property Preview */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Interactive Map Locality Radar / Canvas */}
+          <div className="lg:col-span-8 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 relative overflow-hidden min-h-[520px] flex flex-col justify-between shadow-2xl">
+            {/* Background Grid Pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
+            {/* Top Map Bar */}
+            <div className="relative z-10 flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Navigation className="h-4 w-4 text-emerald-400 animate-spin" style={{ animationDuration: "12s" }} />
+                <span className="text-xs font-bold text-white">
+                  Locality Cluster View • {city || "All Localities"}
+                </span>
+              </div>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                {properties.length} Geo Pins Loaded
+              </span>
+            </div>
+
+            {/* Interactive Locality Map Pins Display */}
+            <div className="relative z-10 py-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {properties.map((prop, idx) => {
+                const isSelected = (selectedPinId || properties[0]?.id) === prop.id;
+                return (
+                  <button
+                    key={prop.id}
+                    onClick={() => setSelectedPinId(prop.id)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all duration-200 group flex flex-col justify-between ${
+                      isSelected
+                        ? "bg-emerald-500/15 border-emerald-500 shadow-lg shadow-emerald-500/20 scale-[1.02]"
+                        : "bg-slate-950/70 border-slate-800 hover:border-slate-700 hover:bg-slate-950"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-2">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`h-2.5 w-2.5 rounded-full shrink-0 ${
+                            isSelected ? "bg-emerald-400 animate-ping" : "bg-slate-600"
+                          }`}
+                        />
+                        <span className="text-xs font-bold text-white truncate max-w-[120px]">
+                          {prop.locality}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-medium text-slate-400 shrink-0">
+                        {prop.bedrooms} BHK
+                      </span>
+                    </div>
+
+                    <div className="flex items-baseline justify-between mt-1 pt-2 border-t border-slate-800/60">
+                      <span className="text-sm font-extrabold text-emerald-400">
+                        ₹{(prop.price / 1000).toFixed(0)}k<span className="text-[10px] text-slate-400 font-normal">/mo</span>
+                      </span>
+                      <span className="text-[10px] text-slate-500 capitalize">
+                        {prop.propertyType.toLowerCase()}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Map Canvas Footer Note */}
+            <div className="relative z-10 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-emerald-400" /> Click any pin to inspect listing details
+              </span>
+              <span>Coordinates verified from property address</span>
+            </div>
+          </div>
+
+          {/* Selected Property Preview Sidebar (4 cols) */}
+          <div className="lg:col-span-4">
+            {(() => {
+              const activeProp =
+                properties.find((p) => p.id === (selectedPinId || properties[0]?.id)) ||
+                properties[0];
+              if (!activeProp) return null;
+
+              const activePrimaryImg =
+                activeProp.images.find((img) => img.isPrimary)?.url ||
+                activeProp.images[0]?.url ||
+                null;
+
+              return (
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+                  {/* Photo */}
+                  <div className="relative h-48 bg-slate-950">
+                    {activePrimaryImg ? (
+                      <img
+                        src={activePrimaryImg}
+                        alt={activeProp.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-600">
+                        <Building2 className="h-10 w-10 mb-1 opacity-40" />
+                        <span className="text-xs">No photos uploaded</span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-900/80 backdrop-blur-md text-emerald-400 border border-emerald-500/30">
+                        {activeProp.propertyType}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Body */}
+                  <div className="p-5 flex flex-col justify-between flex-1 space-y-4">
+                    <div>
+                      <div className="flex items-baseline justify-between mb-1">
+                        <span className="text-2xl font-extrabold text-white">
+                          ₹{activeProp.price.toLocaleString("en-IN")}
+                          <span className="text-xs text-slate-400 font-normal"> / mo</span>
+                        </span>
+                      </div>
+
+                      <h3 className="font-bold text-white text-base mb-1 line-clamp-1">
+                        {activeProp.title}
+                      </h3>
+                      <p className="text-xs text-slate-400 flex items-center gap-1 mb-4">
+                        <MapPin className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        {activeProp.locality}, {activeProp.city}
+                      </p>
+
+                      <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-800 text-xs text-slate-300">
+                        <div className="flex items-center gap-1">
+                          <Bed className="h-3.5 w-3.5 text-slate-500" />
+                          <span>{activeProp.bedrooms} BHK</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Bath className="h-3.5 w-3.5 text-slate-500" />
+                          <span>{activeProp.bathrooms} Bath</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Square className="h-3.5 w-3.5 text-slate-500" />
+                          <span>{activeProp.areaSqft} sqft</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link
+                      to={`/properties/${activeProp.id}`}
+                      className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20 text-center flex items-center justify-center gap-1.5"
+                    >
+                      View Full Listing <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
       ) : (
+        /* Standard Grid View Mode */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {properties.map((prop) => {
             const primaryImage =

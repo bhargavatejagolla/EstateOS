@@ -19,6 +19,7 @@ import {
   AlertCircle,
   Eye,
 } from "lucide-react";
+import { YieldWidget } from "../components/YieldWidget.js";
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -385,6 +386,11 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Yield Intelligence Widget */}
+            <div className="mb-6">
+              <YieldWidget propertyId={property.id} />
+            </div>
 
             {/* Dynamic Funnel Action Card */}
             {isOwnerOfProperty ? (

@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import { CloudinaryService } from "./cloudinary.service.js";
 import { NotFoundError, ForbiddenError } from "../middleware/errors.js";
+import { logAudit } from "../modules/audit/audit.service.js";
 import type { PropertyCreate, PropertyUpdate, PropertySearchQuery } from "@estateos/shared";
 import type { Prisma } from "@prisma/client";
 
@@ -32,6 +33,14 @@ export class PropertyService {
           orderBy: { sortOrder: "asc" },
         },
       },
+    });
+
+    await logAudit(prisma, {
+      userId: ownerId,
+      action: "property.created",
+      entity: "Property",
+      entityId: property.id,
+      metadata: { title: property.title, city: property.city },
     });
 
     return property;
@@ -224,6 +233,14 @@ export class PropertyService {
       },
     });
 
+    await logAudit(prisma, {
+      userId,
+      action: nextStatus === "ACTIVE" ? "property.published" : "property.unpublished",
+      entity: "Property",
+      entityId: id,
+      metadata: { from: property.status, to: nextStatus },
+    });
+
     return updated;
   }
 
@@ -304,5 +321,45 @@ export class PropertyService {
     await prisma.propertyImage.delete({
       where: { id: imageId },
     });
+  }
+
+  static async getMapPins() {
+    const properties = await prisma.property.findMany({
+      where: {
+        status: "ACTIVE",
+        deletedAt: null,
+        latitude: { not: null },
+        longitude: { not: null },
+      },
+      select: {
+        id: true,
+        title: true,
+        price: true,
+        city: true,
+        locality: true,
+        bedrooms: true,
+        propertyType: true,
+        latitude: true,
+        longitude: true,
+        images: {
+          where: { isPrimary: true },
+          select: { url: true },
+          take: 1,
+        },
+      },
+    });
+
+    return properties.map((p) => ({
+      id: p.id,
+      title: p.title,
+      price: Number(p.price),
+      city: p.city,
+      locality: p.locality,
+      bedrooms: p.bedrooms,
+      propertyType: p.propertyType,
+      latitude: p.latitude,
+      longitude: p.longitude,
+      thumbnail: p.images[0]?.url || null,
+    }));
   }
 }

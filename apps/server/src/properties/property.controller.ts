@@ -5,6 +5,7 @@ import {
   PropertySearchQuerySchema,
 } from "@estateos/shared";
 import { PropertyService } from "./property.service.js";
+import { getYieldEstimate } from "../modules/yield/yield.service.js";
 import { BadRequestError, UnauthorizedError } from "../middleware/errors.js";
 
 function getParam(param: string | string[] | undefined, name: string): string {
@@ -86,5 +87,16 @@ export class PropertyController {
     const imageId = getParam(req.params.imageId, "imageId");
     await PropertyService.deleteImage(id, imageId);
     res.status(204).send();
+  }
+
+  static async getMapPins(_req: Request, res: Response): Promise<void> {
+    const pins = await PropertyService.getMapPins();
+    res.status(200).json(pins);
+  }
+
+  static async getYield(req: Request, res: Response): Promise<void> {
+    const id = getParam(req.params.id, "id");
+    const result = await getYieldEstimate(id);
+    res.status(200).json(result);
   }
 }

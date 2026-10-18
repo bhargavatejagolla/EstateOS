@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../lib/auth.js";
+import { NotificationBell } from "./NotificationBell.js";
 import {
   Building2,
   LogOut,
@@ -9,6 +10,10 @@ import {
   PlusCircle,
   LayoutDashboard,
   Search,
+  FileText,
+  Wrench,
+  CreditCard,
+  Sparkles,
 } from "lucide-react";
 
 export function Navbar() {
@@ -34,7 +39,7 @@ export function Navbar() {
                 Estate<span className="text-emerald-400">OS</span>
               </span>
               <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                Phase 3
+                Phase 5
               </span>
             </div>
           </Link>
@@ -48,11 +53,43 @@ export function Navbar() {
               <Search className="h-4 w-4" /> Browse Homes
             </Link>
             {user && (
+              <>
+                <Link
+                  to="/recommendations"
+                  className="hover:text-emerald-400 transition flex items-center gap-1.5"
+                >
+                  <Sparkles className="h-4 w-4 text-emerald-400" /> For You
+                </Link>
+                <Link
+                  to="/favourites"
+                  className="hover:text-emerald-400 transition flex items-center gap-1.5"
+                >
+                  <Heart className="h-4 w-4" /> Saved Homes
+                </Link>
+              </>
+            )}
+            {user?.role === "OWNER" && (
+              <>
+                <Link
+                  to="/owner/leases"
+                  className="hover:text-emerald-400 transition flex items-center gap-1.5"
+                >
+                  <FileText className="h-4 w-4" /> Leases
+                </Link>
+                <Link
+                  to="/owner/maintenance"
+                  className="hover:text-emerald-400 transition flex items-center gap-1.5"
+                >
+                  <Wrench className="h-4 w-4" /> Maintenance
+                </Link>
+              </>
+            )}
+            {(user?.role === "TENANT" || user?.role === "RENTER") && (
               <Link
-                to="/favourites"
+                to="/tenant/dashboard"
                 className="hover:text-emerald-400 transition flex items-center gap-1.5"
               >
-                <Heart className="h-4 w-4" /> Saved Homes
+                <CreditCard className="h-4 w-4" /> My Lease & Rent
               </Link>
             )}
           </nav>
@@ -62,13 +99,16 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           {user ? (
             <div className="flex items-center gap-3">
+              {/* Notification Bell */}
+              <NotificationBell />
+
               {user.role === "OWNER" && (
                 <>
                   <Link
                     to="/owner/dashboard"
                     className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
                   >
-                    <LayoutDashboard className="h-3.5 w-3.5 text-emerald-400" /> Owner Dashboard
+                    <LayoutDashboard className="h-3.5 w-3.5 text-emerald-400" /> Dashboard
                   </Link>
                   <Link
                     to="/owner/properties/new"
@@ -84,7 +124,7 @@ export function Navbar() {
                   to="/renter/dashboard"
                   className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition"
                 >
-                  <Calendar className="h-3.5 w-3.5" /> My Enquiries & Visits
+                  <Calendar className="h-3.5 w-3.5" /> Enquiries & Visits
                 </Link>
               )}
 
@@ -123,3 +163,5 @@ export function Navbar() {
     </header>
   );
 }
+
+export default Navbar;

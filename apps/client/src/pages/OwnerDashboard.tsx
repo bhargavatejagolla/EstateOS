@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api.js";
 import { useAuth } from "../lib/auth.js";
-import type { EnquiryStatus, AppointmentStatus } from "@estateos/shared";
+import type { EnquiryStatus, AppointmentStatus, OwnerDashboardResponse } from "@estateos/shared";
 import {
   Plus,
   Building,
@@ -21,7 +21,18 @@ import {
   EyeOff,
   Clock,
   User as UserIcon,
+  FileText,
+  DollarSign,
+  TrendingUp,
+  Wrench,
+  HelpCircle,
+  Activity,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
+import { SignalFeed } from "../components/SignalFeed.js";
+import { IncomeTrendChart } from "../components/IncomeTrendChart.js";
+import { RecentActivityFeed } from "../components/RecentActivityFeed.js";
 
 interface Property {
   id: string;
@@ -129,6 +140,12 @@ export default function OwnerDashboard() {
     queryFn: () => api.get<Appointment[]>("/api/appointments"),
   });
 
+  // Query: Phase 5 Analytics & Signals
+  const { data: dashboardData, isLoading: loadingDashboard } = useQuery<OwnerDashboardResponse>({
+    queryKey: ["owner-dashboard"],
+    queryFn: () => api.get<OwnerDashboardResponse>("/api/dashboard/owner"),
+  });
+
   // Mutation: Upload Image
   const uploadMutation = useMutation({
     mutationFn: async ({ propertyId, file }: { propertyId: string; file: File }) => {
@@ -224,6 +241,172 @@ export default function OwnerDashboard() {
           {uploadError}
         </div>
       )}
+
+      {/* Phase 5: Reliability Engine Summary KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Occupancy Card */}
+        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span className="font-semibold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <Building className="h-4 w-4 text-emerald-400" /> Occupancy Rate
+            </span>
+            <span
+              className="text-slate-500 hover:text-slate-300 transition cursor-help"
+              title="Formula: rented / (active + rented)"
+            >
+              <HelpCircle className="h-3.5 w-3.5" />
+            </span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-white">
+              {dashboardData?.summary
+                ? `${Math.round(dashboardData.summary.occupancyRate * 100)}%`
+                : "—"}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            {dashboardData?.summary?.rentedProperties ?? 0} rented •{" "}
+            {dashboardData?.summary?.activeProperties ?? 0} vacant
+          </p>
+        </div>
+
+        {/* Monthly Collection Card */}
+        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span className="font-semibold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <DollarSign className="h-4 w-4 text-teal-400" /> Rent Collected
+            </span>
+            <span
+              className="text-slate-500 hover:text-slate-300 transition cursor-help"
+              title="Formula: collected / expected for current calendar month"
+            >
+              <HelpCircle className="h-3.5 w-3.5" />
+            </span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold text-white">
+              ₹{(dashboardData?.summary?.monthlyRentCollected || 0).toLocaleString("en-IN")}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            of ₹{(dashboardData?.summary?.monthlyRentExpected || 0).toLocaleString("en-IN")} (
+            {Math.round((dashboardData?.summary?.collectionRate || 0) * 100)}% realized)
+          </p>
+        </div>
+
+        {/* Overdue Rent Card */}
+        <div
+          className={`p-5 rounded-2xl border shadow-md ${
+            (dashboardData?.summary?.overdueAmount || 0) > 0
+              ? "bg-rose-500/5 border-rose-500/30"
+              : "bg-slate-900 border-slate-800"
+          }`}
+        >
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span className="font-semibold uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-rose-400">
+              <AlertCircle className="h-4 w-4" /> Overdue Rent
+            </span>
+            <span className="text-[10px] text-slate-500">Unpaid Past Due</span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span
+              className={`text-2xl font-extrabold ${
+                (dashboardData?.summary?.overdueAmount || 0) > 0 ? "text-rose-400" : "text-white"
+              }`}
+            >
+              ₹{(dashboardData?.summary?.overdueAmount || 0).toLocaleString("en-IN")}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            {(dashboardData?.summary?.overdueAmount || 0) > 0
+              ? "Follow-up required on tenant dues"
+              : "All tenant accounts in good standing"}
+          </p>
+        </div>
+
+        {/* Open Maintenance Card */}
+        <div
+          className={`p-5 rounded-2xl border shadow-md ${
+            (dashboardData?.summary?.unresolvedMaintenanceCount || 0) > 0
+              ? "bg-amber-500/5 border-amber-500/30"
+              : "bg-slate-900 border-slate-800"
+          }`}
+        >
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span className="font-semibold uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-amber-400">
+              <Wrench className="h-4 w-4" /> Open Maintenance
+            </span>
+            <Link
+              to="/owner/maintenance"
+              className="text-[10px] text-slate-400 hover:text-white transition"
+            >
+              View tickets
+            </Link>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold text-white">
+              {dashboardData?.summary?.unresolvedMaintenanceCount ?? 0}
+            </span>
+            <span className="text-xs text-slate-400">requests</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            {(dashboardData?.summary?.unresolvedMaintenanceCount || 0) > 0
+              ? "Pending contractor/owner resolution"
+              : "Zero open maintenance requests"}
+          </p>
+        </div>
+      </div>
+
+      {/* 3-Column Operational & Analytics Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        {/* Column 1: Action Signals */}
+        <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                <h3 className="font-bold text-white text-sm">Ranked Action Signals</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                {dashboardData?.signals?.length || 0} active
+              </span>
+            </div>
+            <SignalFeed signals={dashboardData?.signals || []} />
+          </div>
+        </div>
+
+        {/* Column 2: 6-Month Income Trend */}
+        <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-teal-400" />
+                <h3 className="font-bold text-white text-sm">6-Month Income Trend</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                Cashflow Realization
+              </span>
+            </div>
+            <IncomeTrendChart data={dashboardData?.incomeTrend || []} />
+          </div>
+        </div>
+
+        {/* Column 3: Tamper-Evident Audit Trail */}
+        <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-blue-400" />
+                <h3 className="font-bold text-white text-sm">Immutable Audit Trail</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                Tamper-Evident
+              </span>
+            </div>
+            <RecentActivityFeed activity={dashboardData?.recentActivity || []} />
+          </div>
+        </div>
+      </div>
 
       {/* Tab Navigation */}
       <div className="flex border-b border-slate-800 mb-8 space-x-8 text-sm font-semibold">
@@ -476,6 +659,15 @@ export default function OwnerDashboard() {
                           <option value="CLOSED_WON">CLOSED_WON</option>
                           <option value="CLOSED_LOST">CLOSED_LOST</option>
                         </select>
+
+                        {enq.status === "CLOSED_WON" && (
+                          <Link
+                            to={`/owner/leases/new?enquiryId=${enq.id}&propertyId=${enq.propertyId}&tenantId=${enq.userId}&price=${enq.property?.price || ""}`}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20 transition flex items-center gap-1"
+                          >
+                            <FileText className="h-3.5 w-3.5" /> Convert to Lease
+                          </Link>
+                        )}
                       </div>
                     </div>
 

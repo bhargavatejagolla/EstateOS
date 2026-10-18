@@ -38,8 +38,14 @@ propertyRouter.get(
   PropertyController.getMine
 );
 
+// Public map pins (must be before /:id)
+propertyRouter.get("/map", PropertyController.getMapPins);
+
 // Public get by ID (with optional auth for isFavourited)
 propertyRouter.get("/:id", optionalAuthenticate, PropertyController.getById);
+
+// Public property yield estimate
+propertyRouter.get("/:id/yield", PropertyController.getYield);
 
 // Publish / unpublish property (Owner or Admin)
 propertyRouter.patch(
