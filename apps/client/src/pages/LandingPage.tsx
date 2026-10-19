@@ -93,183 +93,170 @@ export default function LandingPage() {
         <div className="absolute top-[100px] right-1/4 w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-20 sm:pt-16 sm:pb-28">
-        <div className="text-center max-w-4xl mx-auto">
-          {/* Quick Back & Role Access Bar */}
-          <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
-            {user ? (
-              <Link
-                to={user.role === "OWNER" ? "/owner/dashboard" : "/tenant/dashboard"}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 text-xs font-semibold text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition shadow-lg group"
-              >
-                <ArrowRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-                <span>Back to {user.role === "OWNER" ? "Owner Dashboard" : "Tenant Portal"}</span>
-              </Link>
-            ) : (
-              <Link
-                to="/search"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-700 transition shadow-lg group"
-              >
-                <Search className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                <span>Back to Marketplace Search</span>
-              </Link>
-            )}
+      {/* Hero Section with AeroShards 600px Stage */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-16">
+        <div
+          className="relative rounded-3xl overflow-hidden border border-purple-500/30 bg-slate-950/90 shadow-2xl shadow-purple-950/40"
+          style={{ width: '100%', height: '600px', position: 'relative' }}
+        >
+          {/* AeroShards WebGPU + Canvas2D Animation Layer */}
+          <AeroShards
+            shardColor="#896ABD"
+            accentColor="#A855F7"
+            placement="full"
+            material="glass"
+            markers="plus"
+            count={1300}
+            depthOfField={0.75}
+            vignette={0.3}
+            mouseInteraction
+            pulseOnClick
+            holdToGather
+            lightMode={false}
+            shardSize={1}
+            spread={1}
+            twist={1}
+            billow={1}
+            speed={1}
+            scale={1}
+            glow={0.35}
+            grain={0.06}
+            intro
+            mouseStrength={0.6}
+            parallax={0.5}
+            paused={false}
+          />
 
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-[11px] font-medium text-purple-300">
-              <Sparkles className="h-3 w-3 text-purple-400" />
-              <span>Interactive 3D WebGPU Prism Engine</span>
+          {/* Foreground Hero HUD & Content */}
+          <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 sm:p-6 z-10">
+            {/* Top Bar with Back Option & Shards Badge */}
+            <div className="flex items-center justify-between flex-wrap gap-2 pointer-events-auto">
+              {user ? (
+                <Link
+                  to={user.role === "OWNER" ? "/owner/dashboard" : "/tenant/dashboard"}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/80 backdrop-blur-md border border-emerald-500/30 text-xs font-semibold text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition shadow-lg group"
+                >
+                  <ArrowRight className="h-3.5 w-3.5 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                  <span>Back to {user.role === "OWNER" ? "Owner Dashboard" : "Tenant Portal"}</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/search"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-700 transition shadow-lg group"
+                >
+                  <Search className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <span>Back to Marketplace Search</span>
+                </Link>
+              )}
+
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/70 backdrop-blur-md border border-purple-500/30 text-[11px] font-medium text-purple-300 shadow-lg">
+                <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse"></span>
+                <span>WebGPU 3D AeroShards • 1,300 Glass Prisms</span>
+              </div>
             </div>
-          </div>
 
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold text-emerald-400 mb-6 shadow-lg shadow-emerald-950/20">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>EstateOS 2.0 • Full-Lifecycle Rental Operations</span>
-            <span className="text-slate-600">|</span>
-            <span className="text-slate-400">Zero Brokerage</span>
-          </div>
+            {/* Center Core Hero Content */}
+            <div className="max-w-3xl mx-auto text-center pointer-events-auto my-auto py-2">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-emerald-500/30 text-xs font-semibold text-emerald-400 mb-3 shadow-lg">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>EstateOS 2.0 • Full-Lifecycle Rental Operations</span>
+                <span className="text-slate-600">|</span>
+                <span className="text-slate-400">Zero Brokerage</span>
+              </div>
 
-          {/* Main Title */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.1]">
-            The Property Operating System for{" "}
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
-              Modern Renting.
-            </span>
-          </h1>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-3 leading-[1.15]">
+                The Property Operating System for{" "}
+                <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
+                  Modern Renting.
+                </span>
+              </h1>
 
-          {/* Subtitle */}
-          <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-            Move beyond classifieds. A unified proptech platform connecting discovery, lead pipelines,
-            tamper-evident digital leases, automated rent ledgers, and owner reliability intelligence.
-          </p>
+              <p className="text-xs sm:text-sm md:text-base text-slate-300 max-w-xl mx-auto mb-5 leading-relaxed font-normal">
+                Move beyond classifieds. Connect discovery, lead pipelines, tamper-evident digital leases,
+                automated FIFO rent ledgers, and owner reliability intelligence.
+              </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-            <Link
-              to="/search"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all shadow-xl shadow-emerald-500/25 hover:scale-[1.02] flex items-center justify-center gap-2"
-            >
-              <Search className="h-4 w-4" /> Browse Homes
-            </Link>
-
-            {user ? (
-              <Link
-                to={user.role === "OWNER" ? "/owner/dashboard" : "/tenant/dashboard"}
-                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-800 transition flex items-center justify-center gap-2"
-              >
-                Go to My Dashboard <ArrowRight className="h-4 w-4 text-emerald-400" />
-              </Link>
-            ) : (
-              <Link
-                to="/register"
-                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-800 transition flex items-center justify-center gap-2"
-              >
-                <Key className="h-4 w-4 text-emerald-400" /> Get Started Free
-              </Link>
-            )}
-          </div>
-
-          {/* WebGPU 3D AeroShards Interactive Showcase */}
-          <div className="relative rounded-3xl overflow-hidden border border-purple-500/30 bg-slate-950/80 shadow-2xl shadow-purple-950/40 my-8">
-            <div style={{ width: '100%', height: '600px', position: 'relative' }}>
-              <AeroShards
-                shardColor="#896ABD"
-                accentColor="#A855F7"
-                placement="full"
-                material="glass"
-                markers="plus"
-                count={1300}
-                depthOfField={0.75}
-                vignette={0.3}
-                mouseInteraction
-                pulseOnClick
-                holdToGather
-                lightMode={false}
-                shardSize={1}
-                spread={1}
-                twist={1}
-                billow={1}
-                speed={1}
-                scale={1}
-                glow={0.35}
-                grain={0.06}
-                intro
-                mouseStrength={0.6}
-                parallax={0.5}
-                paused={false}
-              />
-
-              {/* Glassmorphic Floating HUD Overlays */}
-              <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 sm:p-8">
-                {/* Top HUD Strip */}
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-purple-500/30 text-[11px] font-semibold text-purple-300 flex items-center gap-2 shadow-lg">
-                    <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse"></span>
-                    <span>WebGPU Glass Physics • 1,300 Shards</span>
+              {/* Floating Search Bar */}
+              <div className="max-w-2xl mx-auto bg-slate-950/85 backdrop-blur-2xl border border-purple-500/30 p-2 sm:p-2.5 rounded-2xl shadow-2xl shadow-black/80 mb-4">
+                <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1 flex items-center px-3.5 py-2 rounded-xl bg-slate-900/90 border border-slate-800 gap-2 text-xs">
+                    <MapPin className="h-4 w-4 text-emerald-400 shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Enter city or locality (e.g. Bangalore, Indiranagar)..."
+                      value={searchCity}
+                      onChange={(e) => setSearchCity(e.target.value)}
+                      className="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none"
+                    />
                   </div>
-                  <div className="px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-md border border-slate-800 text-[11px] text-slate-400 hidden sm:flex items-center gap-1.5">
-                    <span>🖱️ Drag cursor to tilt • Click & hold to gather shards</span>
-                  </div>
-                </div>
 
-                {/* Center Floating Glass Search Widget */}
-                <div className="pointer-events-auto max-w-2xl w-full mx-auto bg-slate-950/85 backdrop-blur-2xl border border-purple-500/30 p-3 sm:p-4 rounded-2xl shadow-2xl shadow-black/80">
-                  <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2.5">
-                    <div className="flex-1 flex items-center px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2.5 text-xs">
-                      <MapPin className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <input
-                        type="text"
-                        placeholder="Enter city or locality (e.g. Bangalore, Indiranagar)..."
-                        value={searchCity}
-                        onChange={(e) => setSearchCity(e.target.value)}
-                        className="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="sm:w-44 flex items-center px-3 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2 text-xs">
-                      <Bed className="h-4 w-4 text-slate-400 shrink-0" />
-                      <select
-                        value={searchBhk}
-                        onChange={(e) => setSearchBhk(e.target.value)}
-                        className="w-full bg-transparent text-slate-200 focus:outline-none cursor-pointer"
-                      >
-                        <option value="" className="bg-slate-900">Any BHK</option>
-                        <option value="1" className="bg-slate-900">1 BHK</option>
-                        <option value="2" className="bg-slate-900">2 BHK</option>
-                        <option value="3" className="bg-slate-900">3 BHK</option>
-                        <option value="4" className="bg-slate-900">4+ BHK</option>
-                      </select>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 shrink-0"
+                  <div className="sm:w-36 flex items-center px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 gap-2 text-xs">
+                    <Bed className="h-4 w-4 text-slate-400 shrink-0" />
+                    <select
+                      value={searchBhk}
+                      onChange={(e) => setSearchBhk(e.target.value)}
+                      className="w-full bg-transparent text-slate-200 focus:outline-none cursor-pointer"
                     >
-                      <Search className="h-3.5 w-3.5" /> Find Homes
-                    </button>
-                  </form>
-                </div>
+                      <option value="" className="bg-slate-900">Any BHK</option>
+                      <option value="1" className="bg-slate-900">1 BHK</option>
+                      <option value="2" className="bg-slate-900">2 BHK</option>
+                      <option value="3" className="bg-slate-900">3 BHK</option>
+                      <option value="4" className="bg-slate-900">4+ BHK</option>
+                    </select>
+                  </div>
 
-                {/* Bottom Floating Glass Feature Highlights */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pointer-events-auto">
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-emerald-500/40 transition">
-                    <span className="text-xl font-black text-white block">0%</span>
-                    <span className="text-[11px] text-slate-400">Zero Brokerage</span>
-                  </div>
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-emerald-500/40 transition">
-                    <span className="text-xl font-black text-emerald-400 block">FIFO</span>
-                    <span className="text-[11px] text-slate-400">Automated Split Ledger</span>
-                  </div>
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-purple-500/40 transition">
-                    <span className="text-xl font-black text-purple-400 block">100%</span>
-                    <span className="text-[11px] text-slate-400">Tamper-Evident Leases</span>
-                  </div>
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-teal-500/40 transition">
-                    <span className="text-xl font-black text-teal-400 block">&lt; 24h</span>
-                    <span className="text-[11px] text-slate-400">Direct Landlord Tours</span>
-                  </div>
-                </div>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 shrink-0"
+                  >
+                    <Search className="h-3.5 w-3.5" /> Find Homes
+                  </button>
+                </form>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-center gap-3">
+                <Link
+                  to="/search"
+                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20 hover:scale-105 flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5" /> Browse Homes
+                </Link>
+                {user ? (
+                  <Link
+                    to={user.role === "OWNER" ? "/owner/dashboard" : "/tenant/dashboard"}
+                    className="px-5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-xs border border-slate-800 transition flex items-center gap-1.5"
+                  >
+                    My Dashboard <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/register"
+                    className="px-5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-xs border border-slate-800 transition flex items-center gap-1.5"
+                  >
+                    <Key className="h-3.5 w-3.5 text-emerald-400" /> Get Started Free
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Floating Feature Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pointer-events-auto">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-emerald-500/40 transition">
+                <span className="text-base sm:text-lg font-black text-white block">0%</span>
+                <span className="text-[10px] text-slate-400">Zero Brokerage</span>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-emerald-500/40 transition">
+                <span className="text-base sm:text-lg font-black text-emerald-400 block">FIFO</span>
+                <span className="text-[10px] text-slate-400">Automated Split Ledger</span>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-purple-500/40 transition">
+                <span className="text-base sm:text-lg font-black text-purple-400 block">100%</span>
+                <span className="text-[10px] text-slate-400">Tamper-Evident Leases</span>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-teal-500/40 transition">
+                <span className="text-base sm:text-lg font-black text-teal-400 block">&lt; 24h</span>
+                <span className="text-[10px] text-slate-400">Direct Landlord Tours</span>
               </div>
             </div>
           </div>

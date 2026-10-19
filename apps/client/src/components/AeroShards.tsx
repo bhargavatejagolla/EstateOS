@@ -2173,9 +2173,170 @@ export default function AeroShards({
       raf = requestAnimationFrame(tick);
     };
 
+    const startFallback = () => {
+      if (disposed) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = (canvas.width = container.clientWidth * Math.min(window.devicePixelRatio || 1, 2));
+      let height = (canvas.height = container.clientHeight * Math.min(window.devicePixelRatio || 1, 2));
+
+      const shardColors = [settingsRef.current.accentColor || '#A855F7', settingsRef.current.shardColor || '#896ABD', '#C084FC', '#7C3AED'];
+      const shards: any[] = [];
+      const count = Math.min(settingsRef.current.count || 1300, 320);
+
+      for (let i = 0; i < count; i++) {
+        shards.push({
+          x: (Math.random() - 0.5) * width * 1.6,
+          y: (Math.random() - 0.5) * height * 1.6,
+          z: Math.random() * 700 + 100,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          size: Math.random() * 14 + 5,
+          angle: Math.random() * Math.PI * 2,
+          vAngle: (Math.random() - 0.5) * 0.025,
+          color: shardColors[Math.floor(Math.random() * shardColors.length)],
+          alpha: Math.random() * 0.55 + 0.25,
+          sides: Math.random() > 0.4 ? 3 : 4
+        });
+      }
+
+      let mouseX = width / 2;
+      let mouseY = height / 2;
+      let targetMouseX = mouseX;
+      let targetMouseY = mouseY;
+      let isHolding = false;
+      let shockwaveRadius = -1;
+
+      const handleResize = () => {
+        if (!container) return;
+        width = canvas.width = container.clientWidth * Math.min(window.devicePixelRatio || 1, 2);
+        height = canvas.height = container.clientHeight * Math.min(window.devicePixelRatio || 1, 2);
+      };
+      window.addEventListener('resize', handleResize);
+      cleanups.push(() => window.removeEventListener('resize', handleResize));
+
+      const handleMove = (e: PointerEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        targetMouseX = (e.clientX - rect.left) * (width / rect.width);
+        targetMouseY = (e.clientY - rect.top) * (height / rect.height);
+      };
+      const handleDown = (e: PointerEvent) => {
+        if ((e.target as HTMLElement).closest('a, button, input, textarea, select')) return;
+        isHolding = true;
+        shockwaveRadius = 5;
+      };
+      const handleUp = () => {
+        isHolding = false;
+      };
+
+      window.addEventListener('pointermove', handleMove, { passive: true });
+      window.addEventListener('pointerdown', handleDown);
+      window.addEventListener('pointerup', handleUp);
+      cleanups.push(() => {
+        window.removeEventListener('pointermove', handleMove);
+        window.removeEventListener('pointerdown', handleDown);
+        window.removeEventListener('pointerup', handleUp);
+      });
+
+      const drawFrame = () => {
+        if (disposed) return;
+        raf = requestAnimationFrame(drawFrame);
+
+        ctx.clearRect(0, 0, width, height);
+
+        mouseX += (targetMouseX - mouseX) * 0.06;
+        mouseY += (targetMouseY - mouseY) * 0.06;
+
+        if (shockwaveRadius >= 0) {
+          shockwaveRadius += 10;
+          ctx.beginPath();
+          ctx.arc(mouseX, mouseY, shockwaveRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(168, 85, 247, ${Math.max(0, 1 - shockwaveRadius / (width * 0.7)) * 0.6})`;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          if (shockwaveRadius > width * 0.8) shockwaveRadius = -1;
+        }
+
+        for (let i = 0; i < shards.length; i++) {
+          const s = shards[i];
+          s.angle += s.vAngle;
+
+          if (isHolding) {
+            const dx = (mouseX - width / 2) - s.x;
+            const dy = (mouseY - height / 2) - s.y;
+            s.x += dx * 0.05;
+            s.y += dy * 0.05;
+          } else {
+            s.x += s.vx;
+            s.y += s.vy;
+            const mOffsetX = (mouseX - width / 2) * 0.00025 * (800 - s.z);
+            const mOffsetY = (mouseY - height / 2) * 0.00025 * (800 - s.z);
+            s.x += mOffsetX * 0.015;
+            s.y += mOffsetY * 0.015;
+          }
+
+          const boundX = width * 0.85;
+          const boundY = height * 0.85;
+          if (s.x < -boundX) s.x = boundX;
+          if (s.x > boundX) s.x = -boundX;
+          if (s.y < -boundY) s.y = boundY;
+          if (s.y > boundY) s.y = -boundY;
+
+          const fov = 420;
+          const scale = fov / (fov + s.z);
+          const px = width / 2 + s.x * scale;
+          const py = height / 2 + s.y * scale;
+          const size = s.size * scale;
+
+          if (px < -60 || px > width + 60 || py < -60 || py > height + 60) continue;
+
+          ctx.save();
+          ctx.translate(px, py);
+          ctx.rotate(s.angle);
+
+          ctx.beginPath();
+          if (s.sides === 3) {
+            ctx.moveTo(0, -size);
+            ctx.lineTo(size * 0.86, size * 0.5);
+            ctx.lineTo(-size * 0.86, size * 0.5);
+          } else {
+            ctx.moveTo(0, -size * 1.1);
+            ctx.lineTo(size * 0.65, 0);
+            ctx.lineTo(0, size * 0.9);
+            ctx.lineTo(-size * 0.65, 0);
+          }
+          ctx.closePath();
+
+          ctx.fillStyle = s.color;
+          ctx.globalAlpha = s.alpha * Math.min(1, scale * 1.6);
+          ctx.fill();
+
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.globalAlpha = s.alpha * 0.4;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          if (i % 14 === 0) {
+            ctx.strokeStyle = '#A855F7';
+            ctx.globalAlpha = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(-4, 0); ctx.lineTo(4, 0);
+            ctx.moveTo(0, -4); ctx.lineTo(0, 4);
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        }
+      };
+
+      drawFrame();
+    };
+
     start().catch((err) => {
-      // Gracefully handle environments without WebGPU
+      // Gracefully fallback to high-performance Canvas2D if WebGPU is unavailable
       fail(err);
+      startFallback();
     });
 
     return () => {
