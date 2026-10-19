@@ -29,12 +29,4 @@ pnpm prisma:generate
 pnpm prisma:migrate --name init
 ```
 
-### 4. Run Development Servers
-```bash
-# In terminal 1 (Server):
-pnpm dev:server
 
-# In terminal 2 (Client):
-pnpm dev:client
-```
-Visit [http://localhost:5173](http://localhost:5173).
