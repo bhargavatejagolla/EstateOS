@@ -2,12 +2,9 @@ import React, { useState, useEffect } from "react";
 import { api } from "../lib/api.js";
 import {
   Wrench,
-  CheckCircle2,
-  Clock,
   User,
   Building,
   AlertCircle,
-  MessageSquare,
   X,
   History,
 } from "lucide-react";

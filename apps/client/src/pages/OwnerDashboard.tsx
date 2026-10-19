@@ -28,7 +28,6 @@ import {
   HelpCircle,
   Activity,
   ShieldCheck,
-  AlertTriangle,
   ArrowLeft,
   Home,
 } from "lucide-react";
@@ -143,7 +142,7 @@ export default function OwnerDashboard() {
   });
 
   // Query: Phase 5 Analytics & Signals
-  const { data: dashboardData, isLoading: loadingDashboard } = useQuery<OwnerDashboardResponse>({
+  const { data: dashboardData } = useQuery<OwnerDashboardResponse>({
     queryKey: ["owner-dashboard"],
     queryFn: () => api.get<OwnerDashboardResponse>("/api/dashboard/owner"),
   });

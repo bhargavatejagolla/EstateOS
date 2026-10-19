@@ -21,12 +21,12 @@ import LandingPage from "./pages/LandingPage.js";
 
 export function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white" style={{ backgroundColor: '#020617' }}>
       {/* Top Navbar */}
       <Navbar />
 
       {/* Main Routed Content */}
-      <main className="flex-1">
+      <main className="flex-1" style={{ backgroundColor: '#020617' }}>
         <Routes>
           {/* Public Landing & Marketplace Routes */}
           <Route path="/" element={<LandingPage />} />

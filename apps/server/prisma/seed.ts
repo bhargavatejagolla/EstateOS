@@ -148,7 +148,7 @@ async function main() {
     },
   });
 
-  const prop3 = await prisma.property.create({
+  await prisma.property.create({
     data: {
       ownerId: owner.id,
       title: "Independent 4BHK Villa with Private Garden",
@@ -182,7 +182,7 @@ async function main() {
     },
   });
 
-  const prop4 = await prisma.property.create({
+  await prisma.property.create({
     data: {
       ownerId: owner2.id,
       title: "Minimalist 1BHK Studio Apartment",
@@ -278,7 +278,6 @@ async function main() {
   });
 
   // 5. Generate Past 5 Months Paid Obligations (Cashflow Trend)
-  const now = new Date();
   const months = [
     { year: 2026, month: 0, paid: 45000 },
     { year: 2026, month: 1, paid: 45000 },

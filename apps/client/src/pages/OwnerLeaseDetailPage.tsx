@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router";
 import { api } from "../lib/api.js";
 import {
-  FileText,
   CreditCard,
-  Building,
-  User,
   ShieldCheck,
-  CheckCircle2,
   AlertCircle,
   PlusCircle,
   ArrowLeft,
@@ -15,7 +11,6 @@ import {
   History,
 } from "lucide-react";
 import type {
-  LeaseResponse,
   RentObligationResponse,
   PaymentResponse,
 } from "@estateos/shared";
@@ -37,7 +32,7 @@ export function OwnerLeaseDetailPage() {
   const [payNotes, setPayNotes] = useState<string>("");
   const [recordingPayment, setRecordingPayment] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
@@ -57,11 +52,11 @@ export function OwnerLeaseDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     loadData();
-  }, [id]);
+  }, [loadData]);
 
   const handleActivateLease = async () => {
     if (!window.confirm("Activate this lease? The property will automatically become RENTED in search.")) {

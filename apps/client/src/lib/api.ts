@@ -23,39 +23,58 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     credentials: "include",
   });
 
-  if (
-    res.status === 401 &&
-    !normalizedPath.includes("/auth/login") &&
-    !normalizedPath.includes("/auth/register")
-  ) {
-    // Attempt silent token refresh
+let refreshPromise: Promise<string | null> | null = null;
+
+async function requestTokenRefresh(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
     try {
       const refreshRes = await fetch("/api/auth/refresh", {
         method: "POST",
         credentials: "include",
       });
-
       if (refreshRes.ok) {
         const data = await refreshRes.json();
         setAccessToken(data.accessToken);
-        headers.set("Authorization", `Bearer ${data.accessToken}`);
-
-        const retryRes = await fetch(normalizedPath, {
-          ...options,
-          headers,
-          credentials: "include",
-        });
-
-        if (!retryRes.ok) {
-          const retryBody = await retryRes.json().catch(() => ({}));
-          throw new Error(retryBody.error?.message || "Request failed after refresh");
-        }
-
-        if (retryRes.status === 204) return undefined as T;
-        return (await retryRes.json()) as T;
+        return data.accessToken as string;
       }
     } catch {
       // Refresh failed
+    } finally {
+      refreshPromise = null;
+    }
+    setAccessToken(null);
+    return null;
+  })();
+
+  return refreshPromise;
+}
+
+  if (
+    res.status === 401 &&
+    !normalizedPath.includes("/auth/login") &&
+    !normalizedPath.includes("/auth/register") &&
+    !normalizedPath.includes("/auth/refresh")
+  ) {
+    // Attempt silent token refresh once with deduplication
+    const newAccessToken = await requestTokenRefresh();
+
+    if (newAccessToken) {
+      headers.set("Authorization", `Bearer ${newAccessToken}`);
+      const retryRes = await fetch(normalizedPath, {
+        ...options,
+        headers,
+        credentials: "include",
+      });
+
+      if (!retryRes.ok) {
+        const retryBody = await retryRes.json().catch(() => ({}));
+        throw new Error(retryBody.error?.message || "Request failed after refresh");
+      }
+
+      if (retryRes.status === 204) return undefined as T;
+      return (await retryRes.json()) as T;
     }
 
     setAccessToken(null);

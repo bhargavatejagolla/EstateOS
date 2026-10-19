@@ -1,20 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link } from "react-router";
 import { api } from "../lib/api.js";
 import {
-  FileText,
   CreditCard,
   Wrench,
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  Clock,
   ArrowLeft,
   X,
-  Upload,
 } from "lucide-react";
 import type {
-  LeaseResponse,
   RentObligationResponse,
   MaintenanceResponse,
 } from "@estateos/shared";
@@ -41,7 +37,7 @@ export function LeaseDetailPage() {
   const [maintPriority, setMaintPriority] = useState<"LOW" | "MEDIUM" | "HIGH" | "URGENT">("MEDIUM");
   const [submittingMaint, setSubmittingMaint] = useState(false);
 
-  const loadLease = async () => {
+  const loadLease = useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
@@ -60,11 +56,11 @@ export function LeaseDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     loadLease();
-  }, [id]);
+  }, [loadLease]);
 
   // Canvas drawing handlers
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {

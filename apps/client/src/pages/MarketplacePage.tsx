@@ -589,7 +589,7 @@ export default function MarketplacePage() {
 
             {/* Interactive Locality Map Pins Display */}
             <div className="relative z-10 py-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {properties.map((prop, idx) => {
+              {properties.map((prop) => {
                 const isSelected = (selectedPinId || properties[0]?.id) === prop.id;
                 return (
                   <button

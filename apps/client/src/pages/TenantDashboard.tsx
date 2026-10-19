@@ -6,8 +6,6 @@ import {
   CreditCard,
   Wrench,
   AlertCircle,
-  CheckCircle2,
-  Clock,
   ShieldCheck,
   Building,
   ArrowLeft,

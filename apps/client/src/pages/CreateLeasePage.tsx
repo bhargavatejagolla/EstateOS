@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router";
 import { api } from "../lib/api.js";
-import { FilePlus, ArrowLeft, Building2, AlertCircle } from "lucide-react";
+import { FilePlus, ArrowLeft, AlertCircle } from "lucide-react";
 import type { PropertyResponse } from "@estateos/shared";
 
 export function CreateLeasePage() {
@@ -45,7 +45,7 @@ export function CreateLeasePage() {
       }
     }
     loadProperties();
-  }, []);
+  }, [propertyId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

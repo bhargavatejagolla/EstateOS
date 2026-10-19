@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import request from "supertest";
 import { app } from "../app.js";
 import { cleanDb } from "../test/helpers.js";
-import { prisma } from "../lib/prisma.js";
 
 async function makeUser(name: string, email: string, role: "OWNER" | "RENTER" | "TENANT") {
   const res = await request(app).post("/api/auth/register").send({

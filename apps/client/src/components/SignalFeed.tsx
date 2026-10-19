@@ -5,8 +5,6 @@ import {
   AlertCircle,
   AlertTriangle,
   Info,
-  Calendar,
-  Clock,
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
