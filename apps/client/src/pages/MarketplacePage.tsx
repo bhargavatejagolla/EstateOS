@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { api } from "../lib/api.js";
 import { useAuth } from "../lib/auth.js";
 import type { PropertyResponse, PropertyListResponse } from "@estateos/shared";
@@ -18,11 +18,18 @@ import {
   LayoutGrid,
   Navigation,
   ArrowRight,
+  ArrowLeft,
+  Home,
+  X,
+  ShieldCheck,
+  Filter,
 } from "lucide-react";
 
 export default function MarketplacePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
 
   const [properties, setProperties] = useState<PropertyResponse[]>([]);
   const [total, setTotal] = useState(0);
@@ -30,16 +37,43 @@ export default function MarketplacePage() {
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
 
-  // Filters state
-  const [city, setCity] = useState("");
-  const [q, setQ] = useState("");
-  const [bedrooms, setBedrooms] = useState<string>("");
-  const [propertyType, setPropertyType] = useState<string>("");
-  const [furnishing, setFurnishing] = useState<string>("");
-  const [minPrice, setMinPrice] = useState<string>("");
-  const [maxPrice, setMaxPrice] = useState<string>("");
-  const [sortBy, setSortBy] = useState<string>("newest");
+  // Filters state initialized with searchParams
+  const [city, setCity] = useState(searchParams.get("city") || "");
+  const [q, setQ] = useState(searchParams.get("q") || "");
+  const [bedrooms, setBedrooms] = useState<string>(searchParams.get("bedrooms") || "");
+  const [propertyType, setPropertyType] = useState<string>(searchParams.get("propertyType") || "");
+  const [furnishing, setFurnishing] = useState<string>(searchParams.get("furnishing") || "");
+  const [minPrice, setMinPrice] = useState<string>(searchParams.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState<string>(searchParams.get("maxPrice") || "");
+  const [sortBy, setSortBy] = useState<string>(searchParams.get("sortBy") || "newest");
   const [showFilters, setShowFilters] = useState(false);
+
+  const activeFilterCount = [
+    city,
+    q,
+    bedrooms,
+    propertyType,
+    furnishing,
+    minPrice,
+    maxPrice,
+  ].filter(Boolean).length;
+
+  const localities = [
+    { label: "All Localities", value: "" },
+    { label: "Whitefield", value: "Whitefield" },
+    { label: "Indiranagar", value: "Indiranagar" },
+    { label: "Koramangala", value: "Koramangala" },
+    { label: "HSR Layout", value: "HSR Layout" },
+    { label: "Electronic City", value: "Electronic City" },
+  ];
+
+  const bhkOptions = [
+    { label: "All BHK", value: "" },
+    { label: "1 BHK", value: "1" },
+    { label: "2 BHK", value: "2" },
+    { label: "3 BHK", value: "3" },
+    { label: "4+ BHK", value: "4" },
+  ];
 
   const fetchProperties = useCallback(async () => {
     setLoading(true);
@@ -112,25 +146,52 @@ export default function MarketplacePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      {/* Hero Header */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-emerald-950/40 border border-slate-800 p-8 sm:p-12 mb-10 overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Top Breadcrumb & Return to Landing Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-slate-700 text-xs font-semibold transition group shadow-sm"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+          <span>Back to Home Overview</span>
+        </Link>
 
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold uppercase tracking-wider mb-4">
-            <Sparkles className="h-3.5 w-3.5" /> Direct Owner Rentals — Zero Brokerage
+        <nav className="flex items-center gap-2 text-xs text-slate-400">
+          <Link to="/" className="hover:text-emerald-400 transition flex items-center gap-1.5">
+            <Home className="h-3.5 w-3.5" /> Home
+          </Link>
+          <span className="text-slate-600">/</span>
+          <span className="text-emerald-400 font-semibold">Browse Homes ({total})</span>
+        </nav>
+      </div>
+
+      {/* Hero Header */}
+      <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-emerald-950/40 border border-slate-800 p-8 sm:p-12 mb-8 overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 -mb-16 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 max-w-4xl">
+          <div className="flex flex-wrap items-center gap-2.5 mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold uppercase tracking-wider">
+              <Sparkles className="h-3.5 w-3.5" /> Direct Owner Rentals — Zero Brokerage
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700 text-xs font-medium">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>{total} Verified Bangalore Properties</span>
+            </div>
           </div>
+
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             Find verified homes for rent with verified operations.
           </h1>
-          <p className="text-base sm:text-lg text-slate-300 mb-8">
-            Enquire directly with landlords, request in-person or virtual property tours, and sign transparent digital leases.
+          <p className="text-base sm:text-lg text-slate-300 mb-8 max-w-2xl leading-relaxed">
+            Enquire directly with landlords, schedule in-person tours, and sign transparent digital leases backed by automated accounting.
           </p>
 
           {/* Quick Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 bg-slate-950/80 backdrop-blur-md p-2.5 rounded-2xl border border-slate-700/80 shadow-xl">
-            <div className="flex-1 flex items-center px-4 gap-3 bg-slate-900 rounded-xl border border-slate-800">
-              <Search className="h-5 w-5 text-slate-400" />
+          <div className="flex flex-col sm:flex-row gap-3 bg-slate-950/90 backdrop-blur-md p-2.5 rounded-2xl border border-slate-700/80 shadow-2xl mb-4">
+            <div className="flex-1 flex items-center px-4 gap-3 bg-slate-900 rounded-xl border border-slate-800 focus-within:border-emerald-500 transition">
+              <Search className="h-5 w-5 text-slate-400 shrink-0" />
               <input
                 type="text"
                 placeholder="Search by locality, project name, or keyword..."
@@ -138,10 +199,19 @@ export default function MarketplacePage() {
                 onChange={(e) => setQ(e.target.value)}
                 className="w-full py-3 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
               />
+              {q && (
+                <button
+                  onClick={() => setQ("")}
+                  className="p-1 rounded-full text-slate-500 hover:text-white transition"
+                  title="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center px-4 gap-2 bg-slate-900 rounded-xl border border-slate-800 sm:w-48">
-              <MapPin className="h-4 w-4 text-emerald-400" />
+            <div className="flex items-center px-4 gap-2 bg-slate-900 rounded-xl border border-slate-800 sm:w-52 focus-within:border-emerald-500 transition">
+              <MapPin className="h-4 w-4 text-emerald-400 shrink-0" />
               <input
                 type="text"
                 placeholder="City (e.g. Bangalore)"
@@ -149,25 +219,163 @@ export default function MarketplacePage() {
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full py-3 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
               />
+              {city && (
+                <button
+                  onClick={() => setCity("")}
+                  className="p-1 rounded-full text-slate-500 hover:text-white transition"
+                  title="Clear city"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition"
+              className={`px-5 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition ${
+                showFilters || activeFilterCount > 0
+                  ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20"
+                  : "bg-slate-800 hover:bg-slate-700 text-slate-200"
+              }`}
             >
-              <SlidersHorizontal className="h-4 w-4 text-emerald-400" />
-              Filters
+              <SlidersHorizontal className="h-4 w-4" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-950 text-emerald-400">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
+          </div>
+
+          {/* Quick Locality & BHK Selector Chips */}
+          <div className="space-y-2.5">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 font-medium">Popular Localities:</span>
+              {localities.map((loc) => {
+                const isSelected = q === loc.value || (!q && loc.value === "");
+                return (
+                  <button
+                    key={loc.label}
+                    onClick={() => setQ(loc.value)}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+                      isSelected
+                        ? "bg-emerald-500 text-slate-950 font-bold shadow-sm"
+                        : "bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-800"
+                    }`}
+                  >
+                    {loc.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 font-medium">Bedrooms:</span>
+              {bhkOptions.map((bhk) => {
+                const isSelected = bedrooms === bhk.value;
+                return (
+                  <button
+                    key={bhk.label}
+                    onClick={() => setBedrooms(bhk.value)}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+                      isSelected
+                        ? "bg-emerald-500 text-slate-950 font-bold shadow-sm"
+                        : "bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-800"
+                    }`}
+                  >
+                    {bhk.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Active Filter Badges Strip */}
+      {activeFilterCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2 mb-6 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs">
+          <span className="text-slate-400 font-medium flex items-center gap-1.5">
+            <Filter className="h-3.5 w-3.5 text-emerald-400" /> Active Filters:
+          </span>
+
+          {q && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              Locality: "{q}"
+              <button onClick={() => setQ("")} className="hover:text-white" title="Remove filter">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {city && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              City: {city}
+              <button onClick={() => setCity("")} className="hover:text-white" title="Remove filter">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {bedrooms && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              {bedrooms} BHK
+              <button onClick={() => setBedrooms("")} className="hover:text-white" title="Remove filter">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {propertyType && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              Type: {propertyType}
+              <button onClick={() => setPropertyType("")} className="hover:text-white" title="Remove filter">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {furnishing && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              {furnishing.replace("_", " ")}
+              <button onClick={() => setFurnishing("")} className="hover:text-white" title="Remove filter">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {(minPrice || maxPrice) && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              ₹{minPrice ? `${minPrice}` : "0"} - ₹{maxPrice ? `${maxPrice}` : "Any"}
+              <button
+                onClick={() => {
+                  setMinPrice("");
+                  setMaxPrice("");
+                }}
+                className="hover:text-white"
+                title="Remove filter"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          <button
+            onClick={handleResetFilters}
+            className="ml-auto text-slate-400 hover:text-rose-400 transition flex items-center gap-1 font-semibold"
+          >
+            <RotateCcw className="h-3 w-3" /> Clear All
+          </button>
+        </div>
+      )}
 
       {/* Expanded Filter Panel */}
       {showFilters && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-8 animate-in fade-in duration-200">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
             <h3 className="font-semibold text-white text-sm flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 text-emerald-400" /> Filter Properties
+              <SlidersHorizontal className="h-4 w-4 text-emerald-400" /> Advanced Filter Options
             </h3>
             <button
               onClick={handleResetFilters}
@@ -177,7 +385,7 @@ export default function MarketplacePage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs mb-4">
             {/* Bedrooms */}
             <div>
               <label className="block text-slate-400 mb-1.5 font-medium">Bedrooms (BHK)</label>
@@ -226,9 +434,9 @@ export default function MarketplacePage() {
               </select>
             </div>
 
-            {/* Price Range */}
+            {/* Price Range Inputs */}
             <div>
-              <label className="block text-slate-400 mb-1.5 font-medium">Price Range (₹ / Month)</label>
+              <label className="block text-slate-400 mb-1.5 font-medium">Custom Price (₹ / Month)</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -247,6 +455,35 @@ export default function MarketplacePage() {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Quick Price Range Presets */}
+          <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-slate-400 font-medium">Quick Price Presets:</span>
+            {[
+              { label: "< ₹25,000", min: "", max: "25000" },
+              { label: "₹25k - ₹50k", min: "25000", max: "50000" },
+              { label: "₹50k - ₹1 Lakh", min: "50000", max: "100000" },
+              { label: "> ₹1 Lakh", min: "100000", max: "" },
+            ].map((preset) => {
+              const isMatch = minPrice === preset.min && maxPrice === preset.max;
+              return (
+                <button
+                  key={preset.label}
+                  onClick={() => {
+                    setMinPrice(preset.min);
+                    setMaxPrice(preset.max);
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+                    isMatch
+                      ? "bg-emerald-500 text-slate-950 font-bold"
+                      : "bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800"
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -595,6 +832,36 @@ export default function MarketplacePage() {
           })}
         </div>
       )}
+
+      {/* Return to Landing Page & Platform Architecture Banner */}
+      <div className="mt-16 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/50 border border-slate-800 p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold mb-2.5 border border-emerald-500/20">
+            <ShieldCheck className="h-3.5 w-3.5" /> Full-Lifecycle Rental Operations
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            Explore how EstateOS manages the full lease cycle
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
+            See the 5-stage rental lifecycle, test the interactive viva evaluation sandbox, or sign in as an owner or tenant to test real automated FIFO payments.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition border border-slate-700 group shadow-sm"
+          >
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+            <span>Back to Home Overview</span>
+          </Link>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition shadow-lg shadow-emerald-500/20"
+          >
+            Sign In with Demo Account <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

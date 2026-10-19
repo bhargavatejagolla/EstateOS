@@ -14,6 +14,7 @@ import {
   Wrench,
   CreditCard,
   Sparkles,
+  Home,
 } from "lucide-react";
 
 export function Navbar() {
@@ -46,6 +47,12 @@ export function Navbar() {
 
           {/* Quick Nav Links */}
           <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-slate-300">
+            <Link
+              to="/"
+              className="hover:text-emerald-400 transition flex items-center gap-1.5"
+            >
+              <Home className="h-4 w-4" /> Home
+            </Link>
             <Link
               to="/search"
               className="hover:text-emerald-400 transition flex items-center gap-1.5"

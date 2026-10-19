@@ -11,6 +11,8 @@ import {
   Heart,
   ArrowRight,
   ShieldCheck,
+  ArrowLeft,
+  Home,
 } from "lucide-react";
 
 export default function RecommendationsPage() {
@@ -35,6 +37,29 @@ export default function RecommendationsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Top Breadcrumb & Return to Landing Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-slate-700 text-xs font-semibold transition group shadow-sm"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+          <span>Back to Home</span>
+        </Link>
+
+        <nav className="flex items-center gap-2 text-xs text-slate-400">
+          <Link to="/" className="hover:text-emerald-400 transition flex items-center gap-1">
+            <Home className="h-3.5 w-3.5" /> Home
+          </Link>
+          <span className="text-slate-600">/</span>
+          <Link to="/search" className="hover:text-emerald-400 transition">
+            Browse Homes
+          </Link>
+          <span className="text-slate-600">/</span>
+          <span className="text-emerald-400 font-semibold">For You</span>
+        </nav>
+      </div>
+
       {/* Hero Header */}
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-3">

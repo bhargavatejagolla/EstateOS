@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   AlertCircle,
   Eye,
+  Home,
 } from "lucide-react";
 import { YieldWidget } from "../components/YieldWidget.js";
 
@@ -173,12 +174,20 @@ export default function PropertyDetailPage() {
         <AlertCircle className="h-12 w-12 text-rose-500 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-white mb-2">Property Not Found</h2>
         <p className="text-sm text-slate-400 mb-6">{error || "This listing is not available."}</p>
-        <Link
-          to="/"
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold rounded-xl text-xs transition"
-        >
-          Return to Marketplace
-        </Link>
+        <div className="flex items-center justify-center gap-3">
+          <Link
+            to="/search"
+            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold rounded-xl text-xs transition shadow-lg shadow-emerald-500/20"
+          >
+            Browse All Homes
+          </Link>
+          <Link
+            to="/"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition"
+          >
+            Back to Home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -187,14 +196,31 @@ export default function PropertyDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      {/* Back button & Action header */}
-      <div className="flex items-center justify-between mb-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back to Search
-        </Link>
+      {/* Back button, Breadcrumb & Action header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/search"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-emerald-400 hover:border-slate-700 transition group shadow-sm"
+          >
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+            <span>Back to Search</span>
+          </Link>
+
+          <nav className="hidden sm:flex items-center gap-2 text-xs text-slate-400">
+            <Link to="/" className="hover:text-emerald-400 transition flex items-center gap-1">
+              <Home className="h-3.5 w-3.5" /> Home
+            </Link>
+            <span className="text-slate-600">/</span>
+            <Link to="/search" className="hover:text-emerald-400 transition">
+              Browse Homes
+            </Link>
+            <span className="text-slate-600">/</span>
+            <span className="text-slate-200 font-medium truncate max-w-[220px]">
+              {property.title}
+            </span>
+          </nav>
+        </div>
 
         <div className="flex items-center gap-3">
           <button

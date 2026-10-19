@@ -8,9 +8,11 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  ArrowRight,
   ShieldCheck,
   Building,
+  ArrowLeft,
+  ArrowRight,
+  Home,
 } from "lucide-react";
 import type { LeaseResponse, RentObligationResponse, MaintenanceResponse } from "@estateos/shared";
 
@@ -84,6 +86,29 @@ export function TenantDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      {/* Top Breadcrumb & Return to Landing Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-slate-700 text-xs font-semibold transition group shadow-sm"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+          <span>Back to Home</span>
+        </Link>
+
+        <nav className="flex items-center gap-2 text-xs text-slate-400">
+          <Link to="/" className="hover:text-emerald-400 transition flex items-center gap-1">
+            <Home className="h-3.5 w-3.5" /> Home
+          </Link>
+          <span className="text-slate-600">/</span>
+          <Link to="/search" className="hover:text-emerald-400 transition">
+            Browse Homes
+          </Link>
+          <span className="text-slate-600">/</span>
+          <span className="text-emerald-400 font-semibold">My Tenancy</span>
+        </nav>
+      </div>
+
       {/* Page Title */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -113,8 +138,8 @@ export function TenantDashboard() {
             When an owner accepts your enquiry and creates a lease agreement, it will appear here for your electronic acceptance.
           </p>
           <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm transition"
+            to="/search"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm transition shadow-lg shadow-emerald-500/20"
           >
             Explore Available Homes
           </Link>

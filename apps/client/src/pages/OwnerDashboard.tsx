@@ -29,6 +29,8 @@ import {
   Activity,
   ShieldCheck,
   AlertTriangle,
+  ArrowLeft,
+  Home,
 } from "lucide-react";
 import { SignalFeed } from "../components/SignalFeed.js";
 import { IncomeTrendChart } from "../components/IncomeTrendChart.js";
@@ -209,6 +211,29 @@ export default function OwnerDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      {/* Top Breadcrumb & Return to Landing Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-slate-700 text-xs font-semibold transition group shadow-sm"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+          <span>Back to Home</span>
+        </Link>
+
+        <nav className="flex items-center gap-2 text-xs text-slate-400">
+          <Link to="/" className="hover:text-emerald-400 transition flex items-center gap-1">
+            <Home className="h-3.5 w-3.5" /> Home
+          </Link>
+          <span className="text-slate-600">/</span>
+          <Link to="/search" className="hover:text-emerald-400 transition">
+            Browse Homes
+          </Link>
+          <span className="text-slate-600">/</span>
+          <span className="text-emerald-400 font-semibold">Owner Portfolio</span>
+        </nav>
+      </div>
+
       {/* Hidden file input for image uploads */}
       <input
         type="file"
