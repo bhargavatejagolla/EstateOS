@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router";
 import { api } from "../lib/api.js";
 import { useAuth } from "../lib/auth.js";
 import type { PropertyResponse, PropertyListResponse } from "@estateos/shared";
+import AeroShards from "../components/AeroShards.js";
 import {
   Building2,
   ArrowRight,
+  ArrowUp,
   Search,
   MapPin,
   Bed,
@@ -43,6 +45,15 @@ export default function LandingPage() {
   const [searchBhk, setSearchBhk] = useState("");
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [activePersonaTab, setActivePersonaTab] = useState<"owner" | "renter" | "tenant">("owner");
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     async function loadFeatured() {
@@ -83,8 +94,34 @@ export default function LandingPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-20 sm:pt-16 sm:pb-28">
         <div className="text-center max-w-4xl mx-auto">
+          {/* Quick Back & Role Access Bar */}
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
+            {user ? (
+              <Link
+                to={user.role === "OWNER" ? "/owner/dashboard" : "/tenant/dashboard"}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 text-xs font-semibold text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition shadow-lg group"
+              >
+                <ArrowRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                <span>Back to {user.role === "OWNER" ? "Owner Dashboard" : "Tenant Portal"}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/search"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-700 transition shadow-lg group"
+              >
+                <Search className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span>Back to Marketplace Search</span>
+              </Link>
+            )}
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-[11px] font-medium text-purple-300">
+              <Sparkles className="h-3 w-3 text-purple-400" />
+              <span>Interactive 3D WebGPU Prism Engine</span>
+            </div>
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold text-emerald-400 mb-6 shadow-lg shadow-emerald-950/20">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -96,7 +133,7 @@ export default function LandingPage() {
           {/* Main Title */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.1]">
             The Property Operating System for{" "}
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
               Modern Renting.
             </span>
           </h1>
@@ -108,7 +145,7 @@ export default function LandingPage() {
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
             <Link
               to="/search"
               className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all shadow-xl shadow-emerald-500/25 hover:scale-[1.02] flex items-center justify-center gap-2"
@@ -133,61 +170,107 @@ export default function LandingPage() {
             )}
           </div>
 
-          {/* Floating Search Bar */}
-          <div className="max-w-3xl mx-auto bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-3 rounded-2xl shadow-2xl">
-            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2.5">
-              <div className="flex-1 flex items-center px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 gap-2.5 text-xs">
-                <MapPin className="h-4 w-4 text-emerald-400 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Enter city or locality (e.g. Bangalore, Indiranagar)..."
-                  value={searchCity}
-                  onChange={(e) => setSearchCity(e.target.value)}
-                  className="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none"
-                />
+          {/* WebGPU 3D AeroShards Interactive Showcase */}
+          <div className="relative rounded-3xl overflow-hidden border border-purple-500/30 bg-slate-950/80 shadow-2xl shadow-purple-950/40 my-8">
+            <div style={{ width: '100%', height: '600px', position: 'relative' }}>
+              <AeroShards
+                shardColor="#896ABD"
+                accentColor="#A855F7"
+                placement="full"
+                material="glass"
+                markers="plus"
+                count={1300}
+                depthOfField={0.75}
+                vignette={0.3}
+                mouseInteraction
+                pulseOnClick
+                holdToGather
+                lightMode={false}
+                shardSize={1}
+                spread={1}
+                twist={1}
+                billow={1}
+                speed={1}
+                scale={1}
+                glow={0.35}
+                grain={0.06}
+                intro
+                mouseStrength={0.6}
+                parallax={0.5}
+                paused={false}
+              />
+
+              {/* Glassmorphic Floating HUD Overlays */}
+              <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 sm:p-8">
+                {/* Top HUD Strip */}
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-purple-500/30 text-[11px] font-semibold text-purple-300 flex items-center gap-2 shadow-lg">
+                    <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    <span>WebGPU Glass Physics • 1,300 Shards</span>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-md border border-slate-800 text-[11px] text-slate-400 hidden sm:flex items-center gap-1.5">
+                    <span>🖱️ Drag cursor to tilt • Click & hold to gather shards</span>
+                  </div>
+                </div>
+
+                {/* Center Floating Glass Search Widget */}
+                <div className="pointer-events-auto max-w-2xl w-full mx-auto bg-slate-950/85 backdrop-blur-2xl border border-purple-500/30 p-3 sm:p-4 rounded-2xl shadow-2xl shadow-black/80">
+                  <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2.5">
+                    <div className="flex-1 flex items-center px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2.5 text-xs">
+                      <MapPin className="h-4 w-4 text-emerald-400 shrink-0" />
+                      <input
+                        type="text"
+                        placeholder="Enter city or locality (e.g. Bangalore, Indiranagar)..."
+                        value={searchCity}
+                        onChange={(e) => setSearchCity(e.target.value)}
+                        className="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:w-44 flex items-center px-3 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2 text-xs">
+                      <Bed className="h-4 w-4 text-slate-400 shrink-0" />
+                      <select
+                        value={searchBhk}
+                        onChange={(e) => setSearchBhk(e.target.value)}
+                        className="w-full bg-transparent text-slate-200 focus:outline-none cursor-pointer"
+                      >
+                        <option value="" className="bg-slate-900">Any BHK</option>
+                        <option value="1" className="bg-slate-900">1 BHK</option>
+                        <option value="2" className="bg-slate-900">2 BHK</option>
+                        <option value="3" className="bg-slate-900">3 BHK</option>
+                        <option value="4" className="bg-slate-900">4+ BHK</option>
+                      </select>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 shrink-0"
+                    >
+                      <Search className="h-3.5 w-3.5" /> Find Homes
+                    </button>
+                  </form>
+                </div>
+
+                {/* Bottom Floating Glass Feature Highlights */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pointer-events-auto">
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-emerald-500/40 transition">
+                    <span className="text-xl font-black text-white block">0%</span>
+                    <span className="text-[11px] text-slate-400">Zero Brokerage</span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-emerald-500/40 transition">
+                    <span className="text-xl font-black text-emerald-400 block">FIFO</span>
+                    <span className="text-[11px] text-slate-400">Automated Split Ledger</span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-purple-500/40 transition">
+                    <span className="text-xl font-black text-purple-400 block">100%</span>
+                    <span className="text-[11px] text-slate-400">Tamper-Evident Leases</span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-teal-500/40 transition">
+                    <span className="text-xl font-black text-teal-400 block">&lt; 24h</span>
+                    <span className="text-[11px] text-slate-400">Direct Landlord Tours</span>
+                  </div>
+                </div>
               </div>
-
-              <div className="sm:w-44 flex items-center px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 gap-2 text-xs">
-                <Bed className="h-4 w-4 text-slate-400 shrink-0" />
-                <select
-                  value={searchBhk}
-                  onChange={(e) => setSearchBhk(e.target.value)}
-                  className="w-full bg-transparent text-slate-200 focus:outline-none cursor-pointer"
-                >
-                  <option value="" className="bg-slate-900">Any BHK</option>
-                  <option value="1" className="bg-slate-900">1 BHK</option>
-                  <option value="2" className="bg-slate-900">2 BHK</option>
-                  <option value="3" className="bg-slate-900">3 BHK</option>
-                  <option value="4" className="bg-slate-900">4+ BHK</option>
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 shrink-0"
-              >
-                <Search className="h-3.5 w-3.5" /> Find Homes
-              </button>
-            </form>
-          </div>
-
-          {/* Quick Metrics Strip */}
-          <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
-            <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60">
-              <span className="text-2xl font-black text-white block">0%</span>
-              <span className="text-xs text-slate-400">Brokerage & Direct Owner Contact</span>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60">
-              <span className="text-2xl font-black text-emerald-400 block">FIFO</span>
-              <span className="text-xs text-slate-400">Automated Split Rent Obligations</span>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60">
-              <span className="text-2xl font-black text-white block">100%</span>
-              <span className="text-xs text-slate-400">Tamper-Evident Digital Leases</span>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60">
-              <span className="text-2xl font-black text-teal-400 block">&lt; 24h</span>
-              <span className="text-xs text-slate-400">Direct In-Person Visit Scheduling</span>
             </div>
           </div>
         </div>
@@ -819,6 +902,19 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Floating Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-full bg-slate-900/95 backdrop-blur-xl border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all duration-300 shadow-2xl shadow-emerald-500/20 group flex items-center gap-2 text-xs font-bold hover:scale-105 active:scale-95"
+          title="Back to Top"
+          aria-label="Back to Top"
+        >
+          <ArrowUp className="h-4 w-4 group-hover:-translate-y-0.5 transition-transform" />
+          <span className="hidden sm:inline">Back to Top</span>
+        </button>
+      )}
     </div>
   );
 }
