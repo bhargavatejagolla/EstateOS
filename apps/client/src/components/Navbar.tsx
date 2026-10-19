@@ -47,7 +47,7 @@ export function Navbar() {
           {/* Quick Nav Links */}
           <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-slate-300">
             <Link
-              to="/"
+              to="/search"
               className="hover:text-emerald-400 transition flex items-center gap-1.5"
             >
               <Search className="h-4 w-4" /> Browse Homes

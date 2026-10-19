@@ -17,6 +17,7 @@ import CreateLeasePage from "./pages/CreateLeasePage.js";
 import OwnerLeaseDetailPage from "./pages/OwnerLeaseDetailPage.js";
 import OwnerMaintenancePage from "./pages/OwnerMaintenancePage.js";
 import RecommendationsPage from "./pages/RecommendationsPage.js";
+import LandingPage from "./pages/LandingPage.js";
 
 export function App() {
   return (
@@ -27,9 +28,10 @@ export function App() {
       {/* Main Routed Content */}
       <main className="flex-1">
         <Routes>
-          {/* Public Marketplace Routes */}
-          <Route path="/" element={<MarketplacePage />} />
+          {/* Public Landing & Marketplace Routes */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<MarketplacePage />} />
+          <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/properties/:id" element={<PropertyDetailPage />} />
 
           {/* Auth Routes */}
