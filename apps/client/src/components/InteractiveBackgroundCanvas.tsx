@@ -1,17 +1,44 @@
 import React, { useEffect, useRef } from "react";
 
-interface Star {
+interface MicroStar {
   x: number;
   y: number;
+  origX: number;
+  origY: number;
   size: number;
   color: string;
   baseAlpha: number;
   alpha: number;
   twinkleSpeed: number;
-  isGlaring: boolean;
+  phase: number;
+  depth: number;
 }
 
-interface StardustSpark {
+interface LuminousStar {
+  x: number;
+  y: number;
+  origX: number;
+  origY: number;
+  radius: number;
+  color: string;
+  glowColor: string;
+  baseAlpha: number;
+  twinkleSpeed: number;
+  phase: number;
+  depth: number;
+}
+
+interface Meteor {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  angle: number;
+  alpha: number;
+  active: boolean;
+}
+
+interface Stardust {
   x: number;
   y: number;
   vx: number;
@@ -20,16 +47,6 @@ interface StardustSpark {
   alpha: number;
   decay: number;
   color: string;
-}
-
-interface ShootingStar {
-  x: number;
-  y: number;
-  length: number;
-  speed: number;
-  angle: number;
-  alpha: number;
-  active: boolean;
 }
 
 export function InteractiveBackgroundCanvas() {
@@ -46,65 +63,101 @@ export function InteractiveBackgroundCanvas() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Mouse coordinates
-    let mouse = {
+    // Mouse coordinates with smooth damping
+    const mouse = {
       x: width * 0.5,
-      y: height * 0.4,
+      y: height * 0.5,
       targetX: width * 0.5,
-      targetY: height * 0.4,
-      active: false,
+      targetY: height * 0.5,
       prevX: width * 0.5,
-      prevY: height * 0.4,
+      prevY: height * 0.5,
+      active: false,
     };
 
-    const starColors = ["#ffffff", "#e0f2fe", "#7dd3fc", "#38bdf8", "#a7f3d0", "#c084fc"];
+    // Realistic stellar spectral colors (O, B, A, F, G, K class stars)
+    const deepStarColors = [
+      "#ffffff", // Class A (Pure White)
+      "#f8fafc", // Cool White
+      "#e0f2fe", // Class B (Light Cyan-Blue)
+      "#bae6fd", // Electric Sky Blue
+      "#fef3c7", // Class F (Warm Cream)
+      "#fde68a", // Class G (Soft Gold)
+      "#fed7aa", // Class K (Soft Peach)
+    ];
 
-    // 1. Generate Static Twinkling Stars (dense & bright)
-    const starCount = Math.min(Math.floor((width * height) / 7000), 220);
-    const stars: Star[] = [];
+    // 1. Generate Deep Field Pinpoint Micro-Stars (400-500 stars)
+    const microStarCount = Math.min(Math.floor((width * height) / 3200), 450);
+    const microStars: MicroStar[] = [];
 
-    for (let i = 0; i < starCount; i++) {
-      const size = Math.random() < 0.15 ? 2.5 + Math.random() * 1.5 : 1 + Math.random() * 1.6;
-      stars.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        size,
-        color: starColors[Math.floor(Math.random() * starColors.length)] ?? "#ffffff",
-        baseAlpha: 0.4 + Math.random() * 0.6,
-        alpha: 0.4 + Math.random() * 0.6,
-        twinkleSpeed: 0.015 + Math.random() * 0.03,
-        isGlaring: size > 3.0,
+    for (let i = 0; i < microStarCount; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      microStars.push({
+        x,
+        y,
+        origX: x,
+        origY: y,
+        size: 0.45 + Math.random() * 0.75, // Ultra-fine pinpoint stars
+        color: deepStarColors[Math.floor(Math.random() * deepStarColors.length)] ?? "#ffffff",
+        baseAlpha: 0.25 + Math.random() * 0.55,
+        alpha: 0.25 + Math.random() * 0.55,
+        twinkleSpeed: 0.008 + Math.random() * 0.02,
+        phase: Math.random() * Math.PI * 2,
+        depth: 0.01 + Math.random() * 0.015, // Subtle parallax
       });
     }
 
-    // 2. Mouse Stardust Sparks Pool
-    const sparks: StardustSpark[] = [];
+    // 2. Generate Luminous Anchor Stars with Photometric Corona (25-35 stars)
+    const luminousCount = Math.min(Math.floor((width * height) / 45000), 32);
+    const luminousStars: LuminousStar[] = [];
 
-    // 3. Shooting Star State
-    let shootingStar: ShootingStar = {
+    for (let i = 0; i < luminousCount; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const isWarm = Math.random() > 0.65;
+      luminousStars.push({
+        x,
+        y,
+        origX: x,
+        origY: y,
+        radius: 1.2 + Math.random() * 0.8,
+        color: isWarm ? "#fffbeb" : "#f0f9ff",
+        glowColor: isWarm ? "rgba(251, 191, 36, 0.45)" : "rgba(56, 189, 248, 0.45)",
+        baseAlpha: 0.6 + Math.random() * 0.35,
+        twinkleSpeed: 0.012 + Math.random() * 0.018,
+        phase: Math.random() * Math.PI * 2,
+        depth: 0.03 + Math.random() * 0.025, // Prominent parallax
+      });
+    }
+
+    // 3. Stardust particles pool for cursor movement
+    const stardustPool: Stardust[] = [];
+
+    // 4. Realistic Meteors
+    let meteor: Meteor = {
       x: 0,
       y: 0,
-      length: 120,
-      speed: 12,
-      angle: Math.PI / 4,
+      length: 140,
+      speed: 16,
+      angle: (35 * Math.PI) / 180, // Realistic diagonal re-entry angle
       alpha: 0,
       active: false,
     };
 
-    const triggerShootingStar = () => {
-      shootingStar.x = Math.random() * (width * 0.8);
-      shootingStar.y = Math.random() * (height * 0.4);
-      shootingStar.length = 80 + Math.random() * 100;
-      shootingStar.speed = 10 + Math.random() * 8;
-      shootingStar.alpha = 1;
-      shootingStar.active = true;
+    const triggerMeteor = () => {
+      meteor.x = Math.random() * (width * 0.7);
+      meteor.y = Math.random() * (height * 0.3);
+      meteor.length = 100 + Math.random() * 120;
+      meteor.speed = 14 + Math.random() * 10;
+      meteor.alpha = 1;
+      meteor.active = true;
     };
 
-    let meteorTimer = setInterval(() => {
-      if (!shootingStar.active && Math.random() < 0.65) {
-        triggerShootingStar();
+    const meteorInterval = setInterval(() => {
+      if (!meteor.active && Math.random() < 0.7) {
+        triggerMeteor();
       }
-    }, 4500);
+    }, 5500);
 
     const handleResize = () => {
       if (!canvas) return;
@@ -117,21 +170,21 @@ export function InteractiveBackgroundCanvas() {
       mouse.targetY = e.clientY;
       mouse.active = true;
 
-      // Spawn stardust sparks on cursor movement
+      // Spawn subtle cosmic stardust on cursor drag
       const dist = Math.hypot(e.clientX - mouse.prevX, e.clientY - mouse.prevY);
-      if (dist > 6) {
-        const sparkCount = Math.min(Math.floor(dist / 8), 4);
-        for (let i = 0; i < sparkCount; i++) {
-          if (sparks.length < 90) {
-            sparks.push({
-              x: e.clientX + (Math.random() - 0.5) * 12,
-              y: e.clientY + (Math.random() - 0.5) * 12,
-              vx: (Math.random() - 0.5) * 1.5,
-              vy: (Math.random() - 0.5) * 1.5 - 0.5,
-              size: 1.5 + Math.random() * 2.5,
-              alpha: 0.9,
-              decay: 0.02 + Math.random() * 0.03,
-              color: starColors[Math.floor(Math.random() * starColors.length)] ?? "#38bdf8",
+      if (dist > 8) {
+        const count = Math.min(Math.floor(dist / 10), 3);
+        for (let i = 0; i < count; i++) {
+          if (stardustPool.length < 60) {
+            stardustPool.push({
+              x: e.clientX + (Math.random() - 0.5) * 8,
+              y: e.clientY + (Math.random() - 0.5) * 8,
+              vx: (Math.random() - 0.5) * 0.8,
+              vy: (Math.random() - 0.5) * 0.8 - 0.2,
+              size: 0.8 + Math.random() * 1.4,
+              alpha: 0.75,
+              decay: 0.025 + Math.random() * 0.025,
+              color: Math.random() > 0.5 ? "#38bdf8" : "#a7f3d0",
             });
           }
         }
@@ -152,100 +205,171 @@ export function InteractiveBackgroundCanvas() {
 
     const render = () => {
       animId = requestAnimationFrame(render);
-      time += 0.02;
+      time += 0.015;
 
-      // Smooth mouse follow
-      mouse.x += (mouse.targetX - mouse.x) * 0.12;
-      mouse.y += (mouse.targetY - mouse.y) * 0.12;
+      // Smooth mouse interpolation
+      mouse.x += (mouse.targetX - mouse.x) * 0.08;
+      mouse.y += (mouse.targetY - mouse.y) * 0.08;
+
+      const mouseOffsetX = (mouse.x - width * 0.5);
+      const mouseOffsetY = (mouse.y - height * 0.5);
 
       ctx.clearRect(0, 0, width, height);
 
-      // A. Dynamic Mouse Cursor Ambient Spotlight (Bright Aurora Cone)
-      if (mouse.active) {
-        const aura = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 380);
-        aura.addColorStop(0, "rgba(56, 189, 248, 0.14)");
-        aura.addColorStop(0.3, "rgba(99, 102, 241, 0.07)");
-        aura.addColorStop(0.7, "rgba(16, 185, 129, 0.03)");
-        aura.addColorStop(1, "rgba(0, 0, 0, 0)");
+      // ----------------------------------------------------
+      // A. Deep Cosmic Nebula Dust Glows (Organic Space Clouds)
+      // ----------------------------------------------------
+      // Top-Left Deep Cyan Nebula
+      const neb1 = ctx.createRadialGradient(
+        width * 0.25 - mouseOffsetX * 0.02,
+        height * 0.3 - mouseOffsetY * 0.02,
+        20,
+        width * 0.25,
+        height * 0.3,
+        width * 0.45
+      );
+      neb1.addColorStop(0, "rgba(6, 182, 212, 0.055)");
+      neb1.addColorStop(0.5, "rgba(14, 116, 144, 0.025)");
+      neb1.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = neb1;
+      ctx.fillRect(0, 0, width, height);
 
-        ctx.fillStyle = aura;
+      // Bottom-Right Deep Cosmic Violet Nebula
+      const neb2 = ctx.createRadialGradient(
+        width * 0.8 - mouseOffsetX * 0.015,
+        height * 0.75 - mouseOffsetY * 0.015,
+        30,
+        width * 0.8,
+        height * 0.75,
+        width * 0.4
+      );
+      neb2.addColorStop(0, "rgba(139, 92, 246, 0.045)");
+      neb2.addColorStop(0.6, "rgba(79, 70, 229, 0.018)");
+      neb2.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = neb2;
+      ctx.fillRect(0, 0, width, height);
+
+      // ----------------------------------------------------
+      // B. Ambient Mouse Radial Spotlight
+      // ----------------------------------------------------
+      if (mouse.active) {
+        const mouseAura = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 320);
+        mouseAura.addColorStop(0, "rgba(56, 189, 248, 0.08)");
+        mouseAura.addColorStop(0.4, "rgba(14, 165, 233, 0.03)");
+        mouseAura.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = mouseAura;
         ctx.beginPath();
-        ctx.arc(mouse.x, mouse.y, 380, 0, Math.PI * 2);
+        ctx.arc(mouse.x, mouse.y, 320, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // B. Draw Shooting Star (Meteor Trail)
-      if (shootingStar.active) {
-        const tailX = shootingStar.x - Math.cos(shootingStar.angle) * shootingStar.length;
-        const tailY = shootingStar.y - Math.sin(shootingStar.angle) * shootingStar.length;
+      // ----------------------------------------------------
+      // C. Render Deep Pinpoint Micro-Stars (Realistic Scintillation)
+      // ----------------------------------------------------
+      for (let i = 0; i < microStars.length; i++) {
+        const s = microStars[i];
+        if (!s) continue;
 
-        const grad = ctx.createLinearGradient(tailX, tailY, shootingStar.x, shootingStar.y);
-        grad.addColorStop(0, "rgba(56, 189, 248, 0)");
-        grad.addColorStop(0.6, `rgba(56, 189, 248, ${shootingStar.alpha * 0.6})`);
-        grad.addColorStop(1, `rgba(255, 255, 255, ${shootingStar.alpha})`);
+        // Realistic parallax displacement
+        s.x = s.origX - mouseOffsetX * s.depth;
+        s.y = s.origY - mouseOffsetY * s.depth;
+
+        // Scintillating twinkle
+        const twinkle = Math.sin(time * 2 + s.phase) * 0.25;
+        const currentAlpha = Math.max(0.1, Math.min(1, s.baseAlpha + twinkle));
 
         ctx.beginPath();
-        ctx.moveTo(tailX, tailY);
-        ctx.lineTo(shootingStar.x, shootingStar.y);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.8;
-        ctx.stroke();
-
-        shootingStar.x += Math.cos(shootingStar.angle) * shootingStar.speed;
-        shootingStar.y += Math.sin(shootingStar.angle) * shootingStar.speed;
-        shootingStar.alpha -= 0.012;
-
-        if (shootingStar.alpha <= 0 || shootingStar.x > width || shootingStar.y > height) {
-          shootingStar.active = false;
-        }
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = currentAlpha;
+        ctx.fill();
       }
 
-      // C. Render Twinkling Stars
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
-        if (!star) continue;
+      // ----------------------------------------------------
+      // D. Render Luminous Stars with Soft Photometric Corona
+      // ----------------------------------------------------
+      for (let i = 0; i < luminousStars.length; i++) {
+        const ls = luminousStars[i];
+        if (!ls) continue;
 
-        // Dynamic twinkling
-        star.alpha = star.baseAlpha + Math.sin(time + i * 2) * 0.3;
+        ls.x = ls.origX - mouseOffsetX * ls.depth;
+        ls.y = ls.origY - mouseOffsetY * ls.depth;
 
-        // Proximity flare with mouse cursor
-        let currentSize = star.size;
+        const twinkle = Math.sin(time * 3 + ls.phase) * 0.2;
+        let alpha = Math.max(0.2, Math.min(1, ls.baseAlpha + twinkle));
+
+        // Proximity glow if mouse hovers nearby
         if (mouse.active) {
-          const dx = mouse.x - star.x;
-          const dy = mouse.y - star.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < 180) {
-            const factor = 1 - dist / 180;
-            star.alpha = Math.min(1, star.alpha + factor * 0.5);
-            currentSize = star.size * (1 + factor * 1.2);
+          const dist = Math.hypot(mouse.x - ls.x, mouse.y - ls.y);
+          if (dist < 160) {
+            const factor = 1 - dist / 160;
+            alpha = Math.min(1, alpha + factor * 0.4);
           }
         }
 
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, currentSize, 0, Math.PI * 2);
-        ctx.fillStyle = star.color;
-        ctx.globalAlpha = Math.max(0.1, Math.min(1, star.alpha));
-        ctx.fill();
-
-        // Diamond Cross Flare for prominent brighter stars
-        if (star.isGlaring) {
-          const flareLen = currentSize * 3.5;
-          ctx.beginPath();
-          ctx.moveTo(star.x - flareLen, star.y);
-          ctx.lineTo(star.x + flareLen, star.y);
-          ctx.moveTo(star.x, star.y - flareLen);
-          ctx.lineTo(star.x, star.y + flareLen);
-          ctx.strokeStyle = star.color;
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
-        }
+        // Soft Photometric Radial Corona (No hard lines or crosshairs!)
+        const coronaRadius = ls.radius * 4.5;
+        const corona = ctx.createRadialGradient(ls.x, ls.y, 0, ls.x, ls.y, coronaRadius);
+        corona.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+        corona.addColorStop(0.25, ls.glowColor.replace(/[\d.]+\)$/, `${alpha * 0.5})`));
+        corona.addColorStop(0.7, ls.glowColor.replace(/[\d.]+\)$/, `${alpha * 0.15})`));
+        corona.addColorStop(1, "rgba(0, 0, 0, 0)");
 
         ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(ls.x, ls.y, coronaRadius, 0, Math.PI * 2);
+        ctx.fillStyle = corona;
+        ctx.fill();
+
+        // Pinpoint Core Center
+        ctx.beginPath();
+        ctx.arc(ls.x, ls.y, ls.radius * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.globalAlpha = alpha;
+        ctx.fill();
       }
 
-      // D. Render Mouse Stardust Sparks
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        const sp = sparks[i];
+      ctx.globalAlpha = 1;
+
+      // ----------------------------------------------------
+      // E. Render Meteor (Shooting Star Streak)
+      // ----------------------------------------------------
+      if (meteor.active) {
+        const tailX = meteor.x - Math.cos(meteor.angle) * meteor.length;
+        const tailY = meteor.y - Math.sin(meteor.angle) * meteor.length;
+
+        const grad = ctx.createLinearGradient(tailX, tailY, meteor.x, meteor.y);
+        grad.addColorStop(0, "rgba(56, 189, 248, 0)");
+        grad.addColorStop(0.7, `rgba(56, 189, 248, ${meteor.alpha * 0.6})`);
+        grad.addColorStop(1, `rgba(255, 255, 255, ${meteor.alpha})`);
+
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(meteor.x, meteor.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        // Incandescent Head
+        ctx.beginPath();
+        ctx.arc(meteor.x, meteor.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${meteor.alpha})`;
+        ctx.fill();
+
+        meteor.x += Math.cos(meteor.angle) * meteor.speed;
+        meteor.y += Math.sin(meteor.angle) * meteor.speed;
+        meteor.alpha -= 0.015;
+
+        if (meteor.alpha <= 0 || meteor.x > width + 100 || meteor.y > height + 100) {
+          meteor.active = false;
+        }
+      }
+
+      // ----------------------------------------------------
+      // F. Render Cursor Stardust Sparks
+      // ----------------------------------------------------
+      for (let i = stardustPool.length - 1; i >= 0; i--) {
+        const sp = stardustPool[i];
         if (!sp) continue;
 
         sp.x += sp.vx;
@@ -253,7 +377,7 @@ export function InteractiveBackgroundCanvas() {
         sp.alpha -= sp.decay;
 
         if (sp.alpha <= 0) {
-          sparks.splice(i, 1);
+          stardustPool.splice(i, 1);
           continue;
         }
 
@@ -261,10 +385,7 @@ export function InteractiveBackgroundCanvas() {
         ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
         ctx.fillStyle = sp.color;
         ctx.globalAlpha = sp.alpha;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = sp.color;
         ctx.fill();
-        ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
       }
     };
@@ -273,7 +394,7 @@ export function InteractiveBackgroundCanvas() {
 
     return () => {
       cancelAnimationFrame(animId);
-      clearInterval(meteorTimer);
+      clearInterval(meteorInterval);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);

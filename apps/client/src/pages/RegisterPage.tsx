@@ -4,10 +4,9 @@ import { useAuth } from "../lib/auth.js";
 import { InteractiveBackgroundCanvas } from "../components/InteractiveBackgroundCanvas.js";
 import { GlassTiltCard } from "../components/GlassTiltCard.js";
 import { CustomCursor } from "../components/CustomCursor.js";
-import { QuantumPersonaCore } from "../components/QuantumPersonaCore.js";
+import { ArchitecturalResidence3D } from "../components/ArchitecturalResidence3D.js";
 import { LiveHoloIdentityPass } from "../components/LiveHoloIdentityPass.js";
 import {
-  Shield,
   User as UserIcon,
   AlertCircle,
   Mail,
@@ -18,8 +17,6 @@ import {
   EyeOff,
   Building2,
   Sparkles,
-  Zap,
-  CheckCircle2,
   Key,
 } from "lucide-react";
 
@@ -51,7 +48,7 @@ export default function RegisterPage() {
 
     switch (score) {
       case 1:
-        return { score: 1, label: "[LOW ENTROPY • MIN 8 CHARS REQUIRED]", color: "text-rose-400" };
+        return { score: 1, label: "[LOW • MIN 8 CHARACTERS]", color: "text-rose-400" };
       case 2:
         return { score: 2, label: "[MODERATE • ADD SYMBOL OR NUMBER]", color: "text-amber-400" };
       case 3:
@@ -114,116 +111,79 @@ export default function RegisterPage() {
   const isOwner = formData.role === "OWNER";
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] text-slate-100 bg-[#000000] cursor-grid-pattern overflow-hidden px-4 py-8 sm:py-12 selection:bg-cyan-500 selection:text-slate-950">
+    <div className="relative min-h-[calc(100vh-80px)] text-slate-100 bg-[#000000] cursor-grid-pattern overflow-hidden px-4 py-6 sm:py-8 selection:bg-cyan-500 selection:text-slate-950">
       {/* 1. Custom Interactive Magnetic Cursor */}
       <CustomCursor />
 
-      {/* 2. Interactive Twinkling Stars & Cursor Stardust Canvas */}
+      {/* 2. Realistic Astronomical Deep-Space Starfield */}
       <InteractiveBackgroundCanvas />
 
       {/* 3. Deep Dark Nebula Aurora Atmosphere */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div
-          className={`absolute top-1/4 left-1/4 -translate-x-1/2 w-[750px] h-[750px] blur-[170px] rounded-full transition-colors duration-1000 ${
-            isOwner ? "bg-cyan-500/12" : "bg-emerald-500/12"
+          className={`absolute top-1/4 left-1/4 -translate-x-1/2 w-[700px] h-[700px] blur-[170px] rounded-full transition-colors duration-1000 ${
+            isOwner ? "bg-cyan-500/10" : "bg-emerald-500/10"
           }`}
         />
         <div
-          className={`absolute bottom-1/4 right-1/4 w-[650px] h-[650px] blur-[170px] rounded-full transition-colors duration-1000 ${
-            isOwner ? "bg-amber-500/10" : "bg-purple-500/10"
+          className={`absolute bottom-1/4 right-1/4 w-[600px] h-[600px] blur-[170px] rounded-full transition-colors duration-1000 ${
+            isOwner ? "bg-amber-500/8" : "bg-purple-500/8"
           }`}
         />
       </div>
 
       {/* 4. Main Spatial Split-Deck Gateway */}
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Top Header Breadcrumb */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-3 shadow-lg shadow-black/50">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
-            <span className="text-xs font-mono font-bold tracking-wider uppercase text-cyan-300">
-              Genesis Protocol Enrollment
+        {/* Header Breadcrumb */}
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-2 shadow-sm">
+            <Sparkles className="h-3 w-3 text-cyan-400 animate-pulse" />
+            <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-cyan-300">
+              Identity Minting Protocol
             </span>
             <span className="h-1 w-1 rounded-full bg-slate-500" />
-            <span className="text-[11px] font-mono text-slate-400">Ver 2.6</span>
+            <span className="text-[10px] font-mono text-slate-400">Ver 2.6</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">
+          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
             Mint Your <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">EstateOS Identity</span>
           </h1>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto mt-2">
-            Provision verified smart leases, immutable escrow accounts, and zero-brokerage residency keys.
+          <p className="text-xs text-slate-400 max-w-lg mx-auto mt-1">
+            Automated escrow accounts, verified smart leases, and instant digital residency keys.
           </p>
         </div>
 
         {/* 2-Column Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           
           {/* ========================================================= */}
-          {/* LEFT COLUMN: The Genesis Forge (3D Core + Live Passport) */}
+          {/* LEFT COLUMN: 3D Architectural Twin + Live Digital Pass    */}
           {/* ========================================================= */}
-          <div className="lg:col-span-5 xl:col-span-6 space-y-6 order-2 lg:order-1">
-            {/* 3D Quantum Persona Core */}
-            <div className="relative">
-              <QuantumPersonaCore role={formData.role} />
-            </div>
+          <div className="lg:col-span-5 xl:col-span-6 space-y-4 order-2 lg:order-1">
+            {/* 3D Architectural Modern Residence Tower */}
+            <ArchitecturalResidence3D role={formData.role} />
 
             {/* Live Holographic Identity Pass (Real-Time Synchronized) */}
-            <div className="relative">
-              <div className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between px-2">
-                <span className="flex items-center gap-1.5">
-                  <Zap className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Real-Time Synthesized Digital Pass</span>
-                </span>
-                <span className="text-[10px] text-emerald-400 font-semibold animate-pulse">
-                  LIVE TELEMETRY
-                </span>
-              </div>
-
-              <LiveHoloIdentityPass
-                name={formData.name}
-                role={formData.role}
-                email={formData.email}
-                phone={formData.phone}
-              />
-            </div>
-
-            {/* Protocol Guarantees */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md">
-                <div className="flex items-center gap-2 text-cyan-400 mb-1 text-xs font-bold">
-                  <Shield className="h-4 w-4" />
-                  <span>Escrow Bound</span>
-                </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Rent and deposits locked into audited automated ledger smart obligations.
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md">
-                <div className="flex items-center gap-2 text-emerald-400 mb-1 text-xs font-bold">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>Zero Brokerage</span>
-                </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Direct peer handshake between verified landlords and tenants.
-                </p>
-              </div>
-            </div>
+            <LiveHoloIdentityPass
+              name={formData.name}
+              role={formData.role}
+              email={formData.email}
+              phone={formData.phone}
+            />
           </div>
 
           {/* ========================================================= */}
           {/* RIGHT COLUMN: The Minting Console (Form + Controls)      */}
           {/* ========================================================= */}
           <div className="lg:col-span-7 xl:col-span-6 order-1 lg:order-2">
-            <GlassTiltCard maxTilt={4} className="p-6 sm:p-9 border border-white/10 shadow-2xl relative rounded-3xl">
+            <GlassTiltCard maxTilt={3} className="p-5 sm:p-7 border border-white/10 shadow-2xl relative rounded-2xl">
               
               {/* Header inside Form Card */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10 mb-5">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                    <span>Identity Minting Console</span>
+                  <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                    Identity Minting Console
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1">Configure your operator credentials</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Select your role and configure your credentials</p>
                 </div>
 
                 {/* Quick Persona Evaluation Chips */}
@@ -231,7 +191,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={handlePrefillLandlord}
-                    className="px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                    className="px-2.5 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
                     title="Pre-fill Landlord Demo Credentials"
                   >
                     <span>👑 Demo Landlord</span>
@@ -239,7 +199,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={handlePrefillResident}
-                    className="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                    className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
                     title="Pre-fill Resident Demo Credentials"
                   >
                     <span>🔑 Demo Resident</span>
@@ -249,25 +209,25 @@ export default function RegisterPage() {
 
               {/* Error Notice */}
               {error && (
-                <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-3 animate-in fade-in duration-200">
+                <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
                   <div className="font-medium leading-relaxed">{error}</div>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3.5">
                 {/* Account Role Selector */}
                 <div>
-                  <label className="block text-xs font-mono font-bold tracking-wider uppercase text-slate-300 mb-2">
-                    1. Select Network Role
+                  <label className="block text-[11px] font-mono font-bold tracking-wider uppercase text-slate-300 mb-1.5">
+                    1. Network Role
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2.5">
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "OWNER" })}
-                      className={`relative flex items-center justify-center gap-2.5 p-3.5 rounded-2xl border text-xs font-bold transition duration-300 cursor-pointer overflow-hidden ${
+                      className={`relative flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition duration-300 cursor-pointer ${
                         isOwner
-                          ? "bg-gradient-to-r from-cyan-950/60 to-cyan-900/40 border-cyan-400 text-cyan-200 shadow-[0_0_25px_rgba(6,182,212,0.25)]"
+                          ? "bg-gradient-to-r from-cyan-950/60 to-cyan-900/40 border-cyan-400 text-cyan-200 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
                           : "bg-black/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700"
                       }`}
                     >
@@ -277,16 +237,16 @@ export default function RegisterPage() {
                         <div className="text-[10px] text-slate-400 font-normal">Asset Operator</div>
                       </div>
                       {isOwner && (
-                        <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+                        <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
                       )}
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "RENTER" })}
-                      className={`relative flex items-center justify-center gap-2.5 p-3.5 rounded-2xl border text-xs font-bold transition duration-300 cursor-pointer overflow-hidden ${
+                      className={`relative flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition duration-300 cursor-pointer ${
                         !isOwner
-                          ? "bg-gradient-to-r from-emerald-950/60 to-emerald-900/40 border-emerald-400 text-emerald-200 shadow-[0_0_25px_rgba(16,185,129,0.25)]"
+                          ? "bg-gradient-to-r from-emerald-950/60 to-emerald-900/40 border-emerald-400 text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                           : "bg-black/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700"
                       }`}
                     >
@@ -296,7 +256,7 @@ export default function RegisterPage() {
                         <div className="text-[10px] text-slate-400 font-normal">Verified Resident</div>
                       </div>
                       {!isOwner && (
-                        <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       )}
                     </button>
                   </div>
@@ -304,9 +264,9 @@ export default function RegisterPage() {
 
                 {/* Full Name Input */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-semibold text-slate-300">Full Name</label>
-                    <span className="text-[10px] font-mono text-cyan-400">Syncs with Passport</span>
+                    <span className="text-[10px] font-mono text-cyan-400">Syncs with Pass</span>
                   </div>
                   <div className="relative group">
                     <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors pointer-events-none" />
@@ -316,14 +276,14 @@ export default function RegisterPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. Vikram Malhotra"
-                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                     />
                   </div>
                 </div>
 
                 {/* Email Address Input */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Work / Personal Email</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Work / Personal Email</label>
                   <div className="relative group">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors pointer-events-none" />
                     <input
@@ -332,14 +292,14 @@ export default function RegisterPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="vikram@estateos.test"
-                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                     />
                   </div>
                 </div>
 
                 {/* Password Input + Kinetic Energy Meter */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-semibold text-slate-300">Access Keyphrase (Password)</label>
                     <span className={`text-[10px] font-mono font-bold ${passwordStrength.color}`}>
                       {passwordStrength.label}
@@ -354,7 +314,7 @@ export default function RegisterPage() {
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="Minimum 8 characters"
-                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                     />
                     <button
                       type="button"
@@ -391,7 +351,7 @@ export default function RegisterPage() {
 
                 {/* Phone Number Input */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Mobile Number <span className="text-slate-500 font-normal">(Optional for SMS Alerts)</span>
                   </label>
                   <div className="relative group">
@@ -401,27 +361,21 @@ export default function RegisterPage() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+91 98765 43210"
-                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                     />
                   </div>
-                </div>
-
-                {/* Terms and Escrow Statement */}
-                <div className="text-[11px] text-slate-400/80 leading-relaxed pt-1">
-                  By clicking <span className="text-slate-200 font-semibold">Mint Account & Launch</span>, you agree to EstateOS
-                  Smart Lease Protocol Terms, automated escrow clearing conditions, and cryptographically verified communications.
                 </div>
 
                 {/* Submit / Mint Button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full mt-4 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 text-slate-950 font-black text-sm hover:brightness-110 active:scale-95 shadow-[0_0_30px_rgba(6,182,212,0.35)] transition disabled:opacity-50 flex items-center justify-center gap-2 group cursor-pointer"
+                  className="w-full mt-3 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 active:scale-95 shadow-[0_0_25px_rgba(6,182,212,0.3)] transition disabled:opacity-50 flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   {loading ? (
                     <>
                       <span className="h-4 w-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
-                      <span>Minting Cryptographic Pass…</span>
+                      <span>Minting Identity Pass…</span>
                     </>
                   ) : (
                     <>
@@ -433,7 +387,7 @@ export default function RegisterPage() {
               </form>
 
               {/* Footer Switch */}
-              <div className="pt-6 mt-6 border-t border-slate-800/80 text-center text-xs text-slate-400">
+              <div className="pt-4 mt-4 border-t border-slate-800/80 text-center text-xs text-slate-400">
                 Already registered in the network?{" "}
                 <Link to="/login" className="text-cyan-400 hover:text-cyan-300 font-bold hover:underline transition">
                   Sign In to Terminal
