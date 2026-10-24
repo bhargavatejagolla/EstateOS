@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../lib/api.js";
-import { useAuth } from "../lib/auth.js";
 import type { PropertyResponse, PropertyListResponse } from "@estateos/shared";
 import { SpatialStage3D } from "../components/SpatialStage3D.js";
+import { InteractiveBackgroundCanvas } from "../components/InteractiveBackgroundCanvas.js";
+import { GlassTiltCard } from "../components/GlassTiltCard.js";
 import {
   Building2,
   ArrowRight,
@@ -27,10 +28,10 @@ import {
   Terminal,
   Lock,
   Compass,
+  Cpu,
 } from "lucide-react";
 
 export default function LandingPage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Search state
@@ -56,7 +57,6 @@ export default function LandingPage() {
         if (res && res.properties && res.properties.length > 0) {
           setFeaturedProperties(res.properties);
         } else {
-          // Graceful fallback to demo listings if database is empty
           setFeaturedProperties(FALLBACK_PROPERTIES);
         }
       } catch {
@@ -84,63 +84,31 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen text-slate-100 bg-[#020617] overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
-      {/* Background Cyber-Glow Gradients */}
+      {/* 1. Interactive Mouse Canvas: Particle Mesh & Dynamic Ambient Cursor Spotlight */}
+      <InteractiveBackgroundCanvas />
+
+      {/* 2. Ambient Cyber-Glow Deep Gradients */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-b from-cyan-500/15 via-blue-600/10 to-transparent blur-[120px] rounded-full" />
-        <div className="absolute top-[35%] -left-40 w-[550px] h-[550px] bg-indigo-600/10 blur-[140px] rounded-full" />
-        <div className="absolute top-[65%] -right-40 w-[600px] h-[600px] bg-emerald-500/10 blur-[150px] rounded-full" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-cyan-500/15 via-blue-600/10 to-transparent blur-[140px] rounded-full" />
+        <div className="absolute top-[35%] -left-48 w-[600px] h-[600px] bg-indigo-600/10 blur-[160px] rounded-full" />
+        <div className="absolute top-[65%] -right-48 w-[650px] h-[650px] bg-emerald-500/10 blur-[160px] rounded-full" />
       </div>
 
       <div className="relative z-10">
-        {/* Top Floating Telemetry & Portal Bar */}
-        <header className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-2">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 text-xs text-cyan-300 shadow-lg shadow-cyan-950/40">
-              <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
-              <span className="font-semibold tracking-wide">ESTATEOS 2.0</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-slate-300">Spatial Asset Digital Twin & Automation</span>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              {user ? (
-                <Link
-                  to={user.role === "OWNER" ? "/owner/dashboard" : "/tenant/dashboard"}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-xs hover:shadow-lg hover:shadow-cyan-500/25 transition-all group"
-                >
-                  <span>Open {user.role === "OWNER" ? "Owner Portal" : "Tenant Portal"}</span>
-                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    to="/login"
-                    className="px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-800 transition"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-xs hover:brightness-110 shadow-md shadow-cyan-500/20 transition"
-                  >
-                    Get Started Free
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
-
         {/* =========================================================================
-            HERO SECTION: 3D SPATIAL DIGITAL TWIN STAGE + COMMAND INTERFACE
+            HERO SECTION: 3D SPATIAL DIGITAL TWIN + GLASSMORPHIC COMMAND CONSOLE
+            (Note: Duplicate navbar removed so user only sees the primary top navbar)
         ========================================================================= */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-16 lg:pt-10 lg:pb-24">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-16 lg:pt-12 lg:pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Column: Vision & Actions (5 cols) */}
             <div className="lg:col-span-5 text-left z-20 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-emerald-500/30 text-[11px] font-semibold text-emerald-400">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                Zero Brokerage • Institutional-Grade Reliability
+              {/* Luminous Pulsing Radar Pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 text-xs font-semibold text-cyan-300 shadow-lg shadow-cyan-950/40">
+                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+                <span>ESTATEOS 2.0</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-300">Spatial Asset Digital Twin & Automation</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
@@ -155,9 +123,10 @@ export default function LandingPage() {
                 automated FIFO rent ledgers, instant maintenance routing, and explainable AI tenant-landlord matching.
               </p>
 
-              {/* Instant Search Bar */}
-              <div className="bg-slate-950/90 backdrop-blur-2xl border border-cyan-500/30 p-2 rounded-2xl shadow-2xl shadow-cyan-950/40">
-                <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
+              {/* Instant Search Bar with Glassmorphic Specular Rim */}
+              <div className="relative group bg-slate-950/90 backdrop-blur-2xl border border-cyan-500/30 p-2.5 rounded-2xl shadow-2xl shadow-cyan-950/50 hover:border-cyan-400/60 transition-all">
+                <div className="pointer-events-none absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-cyan-500/20 via-blue-500/10 to-emerald-500/20 blur opacity-40 group-hover:opacity-75 transition duration-500" />
+                <form onSubmit={handleSearchSubmit} className="relative z-10 flex flex-col sm:flex-row gap-2">
                   <div className="flex-1 flex items-center px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2.5 text-xs">
                     <MapPin className="h-4 w-4 text-cyan-400 shrink-0" />
                     <input
@@ -194,8 +163,8 @@ export default function LandingPage() {
                 </form>
 
                 {/* Quick Locality Chips */}
-                <div className="flex items-center gap-1.5 pt-2 px-1 text-[11px] text-slate-400 flex-wrap">
-                  <span className="text-slate-500">Popular:</span>
+                <div className="relative z-10 flex items-center gap-1.5 pt-2.5 px-1 text-[11px] text-slate-400 flex-wrap">
+                  <span className="text-slate-500 font-medium">Quick Jump:</span>
                   {["Indiranagar", "Koramangala", "Whitefield", "HSR Layout"].map((loc) => (
                     <button
                       key={loc}
@@ -204,7 +173,7 @@ export default function LandingPage() {
                         setSearchCity(loc);
                         navigate(`/marketplace?city=${encodeURIComponent(loc)}`);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-slate-900 hover:bg-cyan-500/20 hover:text-cyan-300 text-slate-300 transition text-[11px]"
+                      className="px-2.5 py-0.5 rounded-md bg-slate-900/80 hover:bg-cyan-500/20 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/30 transition text-[11px]"
                     >
                       {loc}
                     </button>
@@ -212,20 +181,20 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Social Proof Badges */}
+              {/* Social Proof Metric Tiles with 3D Tilt */}
               <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-slate-950/60 backdrop-blur-xl border border-slate-800/80">
-                  <div className="text-lg font-black text-cyan-400">₹48.2 Cr+</div>
+                <GlassTiltCard maxTilt={6} className="p-3.5 text-center">
+                  <div className="text-xl font-black text-cyan-400">₹48.2 Cr+</div>
                   <div className="text-[11px] text-slate-400 font-medium mt-0.5">Rental Volume</div>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-950/60 backdrop-blur-xl border border-slate-800/80">
-                  <div className="text-lg font-black text-emerald-400">99.4%</div>
+                </GlassTiltCard>
+                <GlassTiltCard maxTilt={6} className="p-3.5 text-center">
+                  <div className="text-xl font-black text-emerald-400">99.4%</div>
                   <div className="text-[11px] text-slate-400 font-medium mt-0.5">On-Time FIFO</div>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-950/60 backdrop-blur-xl border border-slate-800/80">
-                  <div className="text-lg font-black text-indigo-400">0%</div>
+                </GlassTiltCard>
+                <GlassTiltCard maxTilt={6} className="p-3.5 text-center">
+                  <div className="text-xl font-black text-indigo-400">0%</div>
                   <div className="text-[11px] text-slate-400 font-medium mt-0.5">Brokerage Fees</div>
-                </div>
+                </GlassTiltCard>
               </div>
             </div>
 
@@ -239,7 +208,7 @@ export default function LandingPage() {
 
               {/* Interactive Inspector HUD in 3D Stage */}
               <div className="absolute bottom-4 right-4 z-20 pointer-events-auto">
-                <div className="flex items-center gap-2 p-2 rounded-2xl bg-slate-950/85 backdrop-blur-xl border border-slate-800 text-xs shadow-xl">
+                <div className="flex items-center gap-2 p-2 rounded-2xl bg-slate-950/90 backdrop-blur-2xl border border-cyan-500/30 text-xs shadow-xl">
                   <div className="flex items-center gap-2 px-2">
                     <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
                     <span className="text-slate-300 text-[11px] font-mono">
@@ -346,7 +315,7 @@ export default function LandingPage() {
           </div>
 
           {/* Simulator Active Canvas Screen */}
-          <div className="bg-slate-950/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/80 max-w-5xl mx-auto">
+          <GlassTiltCard maxTilt={4} className="p-6 sm:p-10 max-w-5xl mx-auto">
             {activeSimulatorTab === "lease" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center animate-in fade-in duration-300">
                 <div className="space-y-4">
@@ -594,7 +563,7 @@ export default function LandingPage() {
                 </div>
               </div>
             )}
-          </div>
+          </GlassTiltCard>
         </section>
 
         {/* =========================================================================
@@ -634,7 +603,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {activePersonaTab === "owner" && (
               <>
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
                     <Activity className="h-5 w-5" />
                   </div>
@@ -646,9 +615,9 @@ export default function LandingPage() {
                     <span>View Owner Dashboard</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
 
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                     <FileText className="h-5 w-5" />
                   </div>
@@ -660,9 +629,9 @@ export default function LandingPage() {
                     <span>Create a Lease</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
 
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                     <Wrench className="h-5 w-5" />
                   </div>
@@ -674,13 +643,13 @@ export default function LandingPage() {
                     <span>Open Maintenance Desk</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
               </>
             )}
 
             {activePersonaTab === "renter" && (
               <>
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
                     <Search className="h-5 w-5" />
                   </div>
@@ -692,9 +661,9 @@ export default function LandingPage() {
                     <span>Explore Marketplace</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
 
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
                     <Sparkles className="h-5 w-5" />
                   </div>
@@ -706,9 +675,9 @@ export default function LandingPage() {
                     <span>View AI Matches</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
 
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
                     <Clock className="h-5 w-5" />
                   </div>
@@ -720,13 +689,13 @@ export default function LandingPage() {
                     <span>Open Renter Portal</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
               </>
             )}
 
             {activePersonaTab === "tenant" && (
               <>
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                     <CreditCard className="h-5 w-5" />
                   </div>
@@ -738,9 +707,9 @@ export default function LandingPage() {
                     <span>Open Tenant Dashboard</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
 
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                     <FileText className="h-5 w-5" />
                   </div>
@@ -752,9 +721,9 @@ export default function LandingPage() {
                     <span>View Lease Documents</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
 
-                <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 hover:border-cyan-500/40 transition group">
+                <GlassTiltCard maxTilt={6} className="p-6 space-y-3 group">
                   <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
                     <Wrench className="h-5 w-5" />
                   </div>
@@ -766,7 +735,7 @@ export default function LandingPage() {
                     <span>Submit Work Order</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
-                </div>
+                </GlassTiltCard>
               </>
             )}
           </div>
@@ -796,53 +765,51 @@ export default function LandingPage() {
                   <div key={i} className="h-96 rounded-2xl bg-slate-900/50 animate-pulse border border-slate-800" />
                 ))
               : featuredProperties.map((prop) => (
-                  <Link
-                    key={prop.id}
-                    to={`/properties/${prop.id}`}
-                    className="group rounded-2xl bg-slate-950/80 border border-slate-800/80 overflow-hidden hover:border-cyan-500/50 transition-all hover:shadow-2xl hover:shadow-cyan-950/40 flex flex-col"
-                  >
-                    <div className="relative h-52 w-full overflow-hidden bg-slate-900">
-                      <img
-                        src={prop.images?.[0]?.url ?? "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}
-                        alt={prop.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 text-[10px] font-bold text-cyan-300">
-                        VERIFIED DIGITAL TWIN
-                      </div>
-                      <div className="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-slate-950/90 backdrop-blur-md text-white font-black text-sm">
-                        ₹{Number(prop.price).toLocaleString("en-IN")}{" "}
-                        <span className="text-[10px] font-normal text-slate-400">/ mo</span>
-                      </div>
-                    </div>
-
-                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                      <div>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                          <MapPin className="h-3.5 w-3.5 text-cyan-400 shrink-0" />
-                          <span>{prop.locality}, {prop.city}</span>
+                  <GlassTiltCard key={prop.id} maxTilt={6} className="flex flex-col">
+                    <Link to={`/properties/${prop.id}`} className="flex flex-col h-full group">
+                      <div className="relative h-52 w-full overflow-hidden bg-slate-900">
+                        <img
+                          src={prop.images?.[0]?.url ?? "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}
+                          alt={prop.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 text-[10px] font-bold text-cyan-300">
+                          VERIFIED DIGITAL TWIN
                         </div>
-                        <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
-                          {prop.title}
-                        </h4>
+                        <div className="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-slate-950/90 backdrop-blur-md text-white font-black text-sm">
+                          ₹{Number(prop.price).toLocaleString("en-IN")}{" "}
+                          <span className="text-[10px] font-normal text-slate-400">/ mo</span>
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80 text-xs text-slate-400">
-                        <div className="flex items-center gap-1.5">
-                          <Bed className="h-3.5 w-3.5 text-slate-500" />
-                          <span>{prop.bedrooms} BHK</span>
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                          <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
+                            <MapPin className="h-3.5 w-3.5 text-cyan-400 shrink-0" />
+                            <span>{prop.locality}, {prop.city}</span>
+                          </div>
+                          <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
+                            {prop.title}
+                          </h4>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Bath className="h-3.5 w-3.5 text-slate-500" />
-                          <span>{prop.bathrooms} Bath</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Square className="h-3.5 w-3.5 text-slate-500" />
-                          <span>{prop.areaSqft} sqft</span>
+
+                        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80 text-xs text-slate-400">
+                          <div className="flex items-center gap-1.5">
+                            <Bed className="h-3.5 w-3.5 text-slate-500" />
+                            <span>{prop.bedrooms} BHK</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Bath className="h-3.5 w-3.5 text-slate-500" />
+                            <span>{prop.bathrooms} Bath</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Square className="h-3.5 w-3.5 text-slate-500" />
+                            <span>{prop.areaSqft} sqft</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </GlassTiltCard>
                 ))}
           </div>
         </section>
@@ -851,7 +818,7 @@ export default function LandingPage() {
             ONE-CLICK DEMO CREDENTIALS QUICK LAUNCHER
         ========================================================================= */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-800/80">
-          <div className="p-8 rounded-3xl bg-slate-950/80 border border-cyan-500/30 shadow-2xl relative overflow-hidden">
+          <GlassTiltCard maxTilt={4} className="p-8 relative overflow-hidden">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-8">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-xs font-semibold mb-2">
@@ -897,7 +864,7 @@ export default function LandingPage() {
               ].map((acc) => (
                 <div
                   key={acc.email}
-                  className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-3"
+                  className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col justify-between space-y-3"
                 >
                   <div>
                     <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-md border ${acc.color}`}>
@@ -911,7 +878,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => copyCredential(`${acc.email} / ${acc.pass}`, acc.email)}
-                    className="w-full py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 transition"
+                    className="w-full py-1.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 border border-slate-800 transition"
                   >
                     {copiedAccount === acc.email ? (
                       <>
@@ -928,18 +895,26 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </GlassTiltCard>
         </section>
 
         {/* =========================================================================
             FINAL CALL TO ACTION
         ========================================================================= */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
-          <div className="max-w-3xl mx-auto space-y-6">
+          <GlassTiltCard maxTilt={4} className="max-w-4xl mx-auto p-12 space-y-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-semibold text-cyan-400 mb-2">
+              <Cpu className="h-3.5 w-3.5" />
+              <span>Next-Gen Real Estate OS</span>
+            </div>
+
             <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
               Ready to Upgrade Your Rental Operations?
             </h2>
-            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
               Join thousands of owners and tenants managing property lifecycle, digital contracts, and automated rent
               clearing with EstateOS.
             </p>
@@ -957,7 +932,7 @@ export default function LandingPage() {
                 Browse Marketplace
               </Link>
             </div>
-          </div>
+          </GlassTiltCard>
         </section>
       </div>
     </div>

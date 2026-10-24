@@ -340,6 +340,35 @@ export function SpatialStage3D({
     // Raycaster for building interaction
     const raycaster = new THREE.Raycaster();
     const mouseVector = new THREE.Vector2();
+    let lastHoveredMesh: THREE.Mesh | null = null;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!container || !camera) return;
+      const rect = container.getBoundingClientRect();
+      mouseVector.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseVector.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+      raycaster.setFromCamera(mouseVector, camera);
+      const intersects = raycaster.intersectObjects(buildingMeshes);
+
+      if (intersects.length > 0 && intersects[0]) {
+        const hit = intersects[0].object as THREE.Mesh;
+        if (hit !== lastHoveredMesh) {
+          if (lastHoveredMesh && "emissive" in lastHoveredMesh.material) {
+            (lastHoveredMesh.material as THREE.MeshPhysicalMaterial).emissive.setHex(0x000000);
+          }
+          lastHoveredMesh = hit;
+          if (hit && "emissive" in hit.material) {
+            (hit.material as THREE.MeshPhysicalMaterial).emissive.setHex(0x083344);
+          }
+        }
+      } else {
+        if (lastHoveredMesh && "emissive" in lastHoveredMesh.material) {
+          (lastHoveredMesh.material as THREE.MeshPhysicalMaterial).emissive.setHex(0x000000);
+          lastHoveredMesh = null;
+        }
+      }
+    };
 
     const handleClick = (e: MouseEvent) => {
       if (!container || !camera) return;
@@ -377,12 +406,14 @@ export function SpatialStage3D({
       }
     };
 
+    container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("click", handleClick);
 
     // Cleanup
     return () => {
       cancelAnimationFrame(state.reqId);
       window.removeEventListener("resize", handleResize);
+      container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("click", handleClick);
 
       if (renderer.domElement && container.contains(renderer.domElement)) {
