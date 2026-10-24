@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../lib/auth.js";
+import { api } from "../lib/api.js";
 import { BiometricCyberEye } from "../components/BiometricCyberEye.js";
 import { InteractiveBackgroundCanvas } from "../components/InteractiveBackgroundCanvas.js";
 import { GlassTiltCard } from "../components/GlassTiltCard.js";
@@ -54,6 +55,25 @@ export default function LoginPage() {
     setEmail(demoEmail);
     setPassword(demoPass);
     setError(null);
+  };
+
+  const handleQuickResetAndLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({ email: "bhargavatejagolla@gmail.com", password: "Anjibunny@123" }),
+      });
+      setEmail("bhargavatejagolla@gmail.com");
+      setPassword("Anjibunny@123");
+      await login("bhargavatejagolla@gmail.com", "Anjibunny@123");
+      navigate("/owner/dashboard", { replace: true });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Sync failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -141,38 +161,50 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
                   <span className="flex items-center gap-1.5 text-cyan-300">
                     <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-                    <span>Quick-Fill Test Personas:</span>
+                    <span>Verified Test Personas:</span>
                   </span>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
                   <button
                     type="button"
-                    onClick={() => setDemoAccount("ananya@estateos.test")}
-                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 border border-slate-800 hover:border-cyan-500/40 text-[11px] font-semibold transition truncate"
+                    onClick={() => setDemoAccount("bhargavatejagolla@gmail.com", "Anjibunny@123")}
+                    className="px-2 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 text-[11px] font-bold transition truncate cursor-pointer"
+                    title="BT (Owner)"
                   >
-                    👑 Owner
+                    👑 BT (Owner)
                   </button>
                   <button
                     type="button"
-                    onClick={() => setDemoAccount("priya@estateos.test")}
-                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 text-[11px] font-semibold transition truncate"
+                    onClick={() => setDemoAccount("owner8@lease.test", "password123")}
+                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 text-[11px] font-semibold transition truncate cursor-pointer"
+                    title="Owner 8"
                   >
-                    🔑 Tenant
+                    👑 Owner 8
                   </button>
                   <button
                     type="button"
-                    onClick={() => setDemoAccount("rahul@estateos.test")}
-                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-purple-500/20 text-slate-300 hover:text-purple-300 border border-slate-800 hover:border-purple-500/40 text-[11px] font-semibold transition truncate"
+                    onClick={() => setDemoAccount("tenant8@lease.test", "password123")}
+                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-purple-500/20 text-slate-300 hover:text-purple-300 border border-slate-800 hover:border-purple-500/40 text-[11px] font-semibold transition truncate cursor-pointer"
+                    title="Tenant 8"
                   >
-                    🔍 Renter
+                    🔑 Tenant 8
                   </button>
                 </div>
               </div>
 
               {error && (
-                <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
-                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
-                  <div className="font-medium">{error}</div>
+                <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex flex-col gap-2 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+                    <div className="font-medium">{error}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleQuickResetAndLogin}
+                    className="text-left text-[11px] text-cyan-300 hover:text-cyan-200 underline font-bold cursor-pointer"
+                  >
+                    ⚡ Click here to 1-click sync password for bhargavatejagolla@gmail.com & Enter Dashboard
+                  </button>
                 </div>
               )}
 

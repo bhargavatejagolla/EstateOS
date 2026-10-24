@@ -1,25 +1,26 @@
 import { prisma } from "../lib/prisma.js";
 import { PasswordService } from "./password.service.js";
 import { TokenService } from "./token.service.js";
-import { ConflictError, UnauthorizedError } from "../middleware/errors.js";
+import { ConflictError, UnauthorizedError, NotFoundError } from "../middleware/errors.js";
 import type { RegisterInput, LoginInput } from "@estateos/shared";
 
 export class AuthService {
   static async register(input: RegisterInput) {
+    const email = input.email.trim().toLowerCase();
     const existing = await prisma.user.findUnique({
-      where: { email: input.email.toLowerCase() },
+      where: { email },
     });
 
     if (existing) {
-      throw new ConflictError("A user with this email already exists");
+      throw new ConflictError("An account with this email already exists. Please sign in.");
     }
 
     const passwordHash = await PasswordService.hash(input.password);
 
     const user = await prisma.user.create({
       data: {
-        name: input.name,
-        email: input.email.toLowerCase(),
+        name: input.name.trim(),
+        email,
         passwordHash,
         role: input.role,
         phone: input.phone || null,
@@ -60,8 +61,9 @@ export class AuthService {
   }
 
   static async login(input: LoginInput) {
+    const email = input.email.trim().toLowerCase();
     const user = await prisma.user.findUnique({
-      where: { email: input.email.toLowerCase() },
+      where: { email },
     });
 
     if (!user || !user.isActive) {
@@ -107,6 +109,25 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  static async resetPassword(email: string, newPassword: string) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user) {
+      throw new NotFoundError("No account found with this email");
+    }
+
+    const passwordHash = await PasswordService.hash(newPassword);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash },
+    });
+
+    return { success: true, message: "Password updated successfully" };
   }
 
   static async refresh(rawRefreshToken: string) {

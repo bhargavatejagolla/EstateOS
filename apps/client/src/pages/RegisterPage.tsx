@@ -209,9 +209,22 @@ export default function RegisterPage() {
 
               {/* Error Notice */}
               {error && (
-                <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
-                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
-                  <div className="font-medium leading-relaxed">{error}</div>
+                <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex flex-col gap-2 animate-in fade-in duration-200">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
+                    <div className="font-medium leading-relaxed">{error}</div>
+                  </div>
+                  {error.toLowerCase().includes("already exists") && (
+                    <div className="pl-6">
+                      <Link
+                        to="/login"
+                        state={{ email: formData.email }}
+                        className="inline-flex items-center gap-1 text-cyan-300 hover:text-cyan-200 font-bold underline cursor-pointer"
+                      >
+                        <span>👉 Click here to Sign In with this email</span>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -8,7 +8,14 @@ export const RegisterInputSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters").max(128),
   role: z.enum(["OWNER", "RENTER"]).default("RENTER"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits").max(15).optional(),
+  phone: z
+    .string()
+    .optional()
+    .nullable()
+    .transform((val) => (val && val.trim().length > 0 ? val.trim() : undefined))
+    .refine((val) => !val || val.length >= 7, {
+      message: "Phone number must have at least 7 digits",
+    }),
 });
 
 export const LoginInputSchema = z.object({

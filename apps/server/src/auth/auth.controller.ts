@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { RegisterInputSchema, LoginInputSchema } from "@estateos/shared";
 import { AuthService } from "./auth.service.js";
 import { env } from "../config/env.js";
-import { UnauthorizedError } from "../middleware/errors.js";
+import { UnauthorizedError, BadRequestError } from "../middleware/errors.js";
 
 const COOKIE_NAME = "refresh_token";
 
@@ -48,6 +48,15 @@ export class AuthController {
       user: result.user,
       accessToken: result.accessToken,
     });
+  }
+
+  static async resetPassword(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      throw new BadRequestError("Email and new password are required");
+    }
+    const result = await AuthService.resetPassword(email, password);
+    res.status(200).json(result);
   }
 
   static async refresh(req: Request, res: Response): Promise<void> {
