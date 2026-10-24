@@ -1,7 +1,22 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../lib/auth.js";
-import { Building2, AlertCircle } from "lucide-react";
+import { BiometricCyberEye } from "../components/BiometricCyberEye.js";
+import { InteractiveBackgroundCanvas } from "../components/InteractiveBackgroundCanvas.js";
+import { GlassTiltCard } from "../components/GlassTiltCard.js";
+import { CustomCursor } from "../components/CustomCursor.js";
+import {
+  Lock,
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Sparkles,
+  KeyRound,
+  Cpu,
+} from "lucide-react";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -10,8 +25,13 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // States for interactive Cyber-Eye
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,64 +50,210 @@ export default function LoginPage() {
     }
   };
 
+  const setDemoAccount = (demoEmail: string, demoPass = "password123") => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setError(null);
+  };
+
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-2xl p-8 backdrop-blur-md shadow-2xl">
-        <div className="text-center mb-8">
-          <div className="inline-flex h-12 w-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 items-center justify-center mb-3">
-            <Building2 className="h-6 w-6" />
+    <div className="relative min-h-[calc(100vh-80px)] text-slate-100 bg-[#000000] cursor-grid-pattern overflow-hidden flex items-center justify-center px-4 py-8 sm:py-14 selection:bg-cyan-500 selection:text-slate-950">
+      {/* 1. Cursor AI Interactive Magnetic Laser Follower */}
+      <CustomCursor />
+
+      {/* 2. Interactive Twinkling Stars & Stardust Trail */}
+      <InteractiveBackgroundCanvas />
+
+      {/* 3. Deep Obsidian Aurora Glow Gradients */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 w-[650px] h-[650px] bg-cyan-500/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-1/4 right-1/4 w-[650px] h-[650px] bg-indigo-600/10 blur-[160px] rounded-full" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* =========================================================================
+              LEFT COLUMN: BIOMETRIC CYBER-EYE SENTINEL & LIVE TELEMETRY
+          ========================================================================= */}
+          <div className="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/90 border border-cyan-500/40 text-xs font-semibold text-cyan-300 shadow-xl shadow-cyan-950/40">
+                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+                <span>BIOMETRIC SPATIAL GATEWAY</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-400">Zero-Trust Auth</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.12]">
+                EstateOS Identity & <br />
+                <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
+                  Access Portal.
+                </span>
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-400 max-w-md leading-relaxed">
+                Connect directly to your verified property portfolio, digital lease contracts, and real-time cashflow ledgers.
+              </p>
+            </div>
+
+            {/* The Interactive Cyber-Eye Sentinel */}
+            <div className="relative py-4">
+              <BiometricCyberEye
+                size={270}
+                isPasswordFocused={isPasswordFocused}
+                isHoveringSubmit={isHoveringSubmit}
+                isAuthenticating={loading}
+              />
+            </div>
+
+            {/* Security Guarantee Pills */}
+            <div className="grid grid-cols-3 gap-2.5 w-full max-w-md pt-2">
+              <div className="p-2.5 rounded-xl bg-black/80 border border-white/10 text-center">
+                <ShieldCheck className="h-4 w-4 text-emerald-400 mx-auto mb-1" />
+                <div className="text-[10px] text-slate-400 font-mono">TLS 1.3</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-black/80 border border-white/10 text-center">
+                <KeyRound className="h-4 w-4 text-cyan-400 mx-auto mb-1" />
+                <div className="text-[10px] text-slate-400 font-mono">SHA-256 JWT</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-black/80 border border-white/10 text-center">
+                <Cpu className="h-4 w-4 text-purple-400 mx-auto mb-1" />
+                <div className="text-[10px] text-slate-400 font-mono">AUDIT READY</div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
-          <p className="text-sm text-slate-400 mt-1">Log in to your EstateOS management workspace</p>
+
+          {/* =========================================================================
+              RIGHT COLUMN: GLASSMORPHIC AUTH CARD WITH QUICK-FILL ROLES
+          ========================================================================= */}
+          <div className="lg:col-span-6 w-full max-w-md mx-auto">
+            <GlassTiltCard maxTilt={5} className="p-7 sm:p-9 border border-white/10 shadow-2xl relative">
+              <div className="text-left mb-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-white tracking-tight">Sign In</h2>
+                  <span className="text-[11px] font-mono text-cyan-400 px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30">
+                    SECURE NODE
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Enter credentials or select a verified test persona below.</p>
+              </div>
+
+              {/* Instant 1-Click Demo Account Quick-Fill Chips */}
+              <div className="mb-6 p-3 rounded-xl bg-black/60 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                  <span className="flex items-center gap-1.5 text-cyan-300">
+                    <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>Quick-Fill Test Personas:</span>
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setDemoAccount("ananya@estateos.test")}
+                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 border border-slate-800 hover:border-cyan-500/40 text-[11px] font-semibold transition truncate"
+                  >
+                    👑 Owner
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoAccount("priya@estateos.test")}
+                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 text-[11px] font-semibold transition truncate"
+                  >
+                    🔑 Tenant
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoAccount("rahul@estateos.test")}
+                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-purple-500/20 text-slate-300 hover:text-purple-300 border border-slate-800 hover:border-purple-500/40 text-[11px] font-semibold transition truncate"
+                  >
+                    🔍 Renter
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
+                  <div className="font-medium">{error}</div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Email Input */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+                  <div className="relative group">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-cyan-400 transition-colors pointer-events-none" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="e.g. ananya@estateos.test"
+                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Password Input (Triggers Eye Shielding on focus!) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-300">Password</label>
+                    <span className="text-[10px] text-slate-500 font-mono">Encrypted Input</span>
+                  </div>
+                  <div className="relative group">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-purple-400 transition-colors pointer-events-none" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => setIsPasswordFocused(true)}
+                      onBlur={() => setIsPasswordFocused(false)}
+                      placeholder="••••••••"
+                      className="w-full bg-black/80 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 p-1"
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Action Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  onMouseEnter={() => setIsHoveringSubmit(true)}
+                  onMouseLeave={() => setIsHoveringSubmit(false)}
+                  className="w-full mt-5 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 text-slate-950 font-black text-xs hover:brightness-110 active:scale-95 shadow-xl shadow-cyan-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2 group cursor-pointer"
+                >
+                  {loading ? (
+                    <>
+                      <span className="h-3.5 w-3.5 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
+                      <span>Authenticating Handshake…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Authorize & Sign In</span>
+                      <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Footer Switch */}
+              <div className="pt-6 mt-6 border-t border-slate-800/80 text-center text-xs text-slate-400">
+                New to EstateOS?{" "}
+                <Link to="/register" className="text-cyan-400 hover:text-cyan-300 font-bold hover:underline transition">
+                  Create a free account
+                </Link>
+              </div>
+            </GlassTiltCard>
+          </div>
         </div>
-
-        {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-            <div>{error}</div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Email Address</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="owner@estateos.dev"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 disabled:opacity-50"
-          >
-            {loading ? "Authenticating…" : "Sign In"}
-          </button>
-        </form>
-
-        <p className="text-center text-xs text-slate-400 mt-6">
-          Don't have an account yet?{" "}
-          <Link to="/register" className="text-emerald-400 hover:underline font-medium">
-            Create an account
-          </Link>
-        </p>
       </div>
     </div>
   );
