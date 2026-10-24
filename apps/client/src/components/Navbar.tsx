@@ -74,7 +74,7 @@ export function Navbar() {
               <span>Browse Homes</span>
             </Link>
 
-            {user && (
+            {user && user.role !== "OWNER" && (
               <>
                 <Link
                   to="/recommendations"
