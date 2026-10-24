@@ -117,15 +117,15 @@ export default function LandingPage() {
               </div>
 
               {/* Kinetic Headline with Dynamic Text Rotator */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12]">
                 The Operating System for{" "}
                 <br className="hidden sm:inline" />
                 <KineticTextRotator
                   phrases={[
                     "Modern Renting.",
-                    "Autonomous Cashflow.",
-                    "Institutional Portfolios.",
-                    "Digital Twin Estates.",
+                    "Smart Portfolios.",
+                    "Auto Cashflow.",
+                    "Digital Twins.",
                   ]}
                 />
               </h1>

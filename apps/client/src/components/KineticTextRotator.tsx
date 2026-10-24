@@ -53,7 +53,7 @@ export function KineticTextRotator({
   }, [displayText, isDeleting, phraseIndex, phrases, typingSpeed, pauseDuration]);
 
   return (
-    <span className={`inline-flex items-center ${className}`}>
+    <span className={`inline-flex items-center whitespace-nowrap ${className}`}>
       <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
         {displayText}
       </span>
