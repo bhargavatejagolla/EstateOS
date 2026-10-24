@@ -5,6 +5,9 @@ import type { PropertyResponse, PropertyListResponse } from "@estateos/shared";
 import { SpatialStage3D } from "../components/SpatialStage3D.js";
 import { InteractiveBackgroundCanvas } from "../components/InteractiveBackgroundCanvas.js";
 import { GlassTiltCard } from "../components/GlassTiltCard.js";
+import { CustomCursor } from "../components/CustomCursor.js";
+import { KineticTextRotator } from "../components/KineticTextRotator.js";
+import { CursorTerminalPreview } from "../components/CursorTerminalPreview.js";
 import {
   Building2,
   ArrowRight,
@@ -83,39 +86,48 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative min-h-screen text-slate-100 bg-[#020617] overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
-      {/* 1. Interactive Mouse Canvas: Particle Mesh & Dynamic Ambient Cursor Spotlight */}
+    <div className="relative min-h-screen text-slate-100 bg-[#000000] cursor-grid-pattern overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
+      {/* 1. Cursor AI Interactive Magnetic Laser Follower */}
+      <CustomCursor />
+
+      {/* 2. Interactive Ambient Particle Mesh & Dynamic Flashlight Spotlight */}
       <InteractiveBackgroundCanvas />
 
-      {/* 2. Ambient Cyber-Glow Deep Gradients */}
+      {/* 3. Deep Dark Nebula Aurora Gradients */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-cyan-500/15 via-blue-600/10 to-transparent blur-[140px] rounded-full" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-b from-cyan-500/15 via-blue-600/10 to-transparent blur-[140px] rounded-full" />
         <div className="absolute top-[35%] -left-48 w-[600px] h-[600px] bg-indigo-600/10 blur-[160px] rounded-full" />
         <div className="absolute top-[65%] -right-48 w-[650px] h-[650px] bg-emerald-500/10 blur-[160px] rounded-full" />
       </div>
 
       <div className="relative z-10">
         {/* =========================================================================
-            HERO SECTION: 3D SPATIAL DIGITAL TWIN + GLASSMORPHIC COMMAND CONSOLE
-            (Note: Duplicate navbar removed so user only sees the primary top navbar)
+            HERO SECTION: KINETIC HEADLINE + 3D SPATIAL DIGITAL TWIN STAGE
         ========================================================================= */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-16 lg:pt-12 lg:pb-24">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-14 lg:pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Column: Vision & Actions (5 cols) */}
             <div className="lg:col-span-5 text-left z-20 space-y-6">
               {/* Luminous Pulsing Radar Pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 text-xs font-semibold text-cyan-300 shadow-lg shadow-cyan-950/40">
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-950/90 backdrop-blur-xl border border-cyan-500/40 text-xs font-semibold text-cyan-300 shadow-xl shadow-cyan-950/40 hover:border-cyan-400 transition">
                 <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
                 <span>ESTATEOS 2.0</span>
                 <span className="text-slate-600">•</span>
                 <span className="text-slate-300">Spatial Asset Digital Twin & Automation</span>
               </div>
 
+              {/* Kinetic Headline with Dynamic Text Rotator */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
                 The Operating System for{" "}
-                <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
-                  Modern Real Estate.
-                </span>
+                <br className="hidden sm:inline" />
+                <KineticTextRotator
+                  phrases={[
+                    "Modern Renting.",
+                    "Autonomous Cashflow.",
+                    "Institutional Portfolios.",
+                    "Digital Twin Estates.",
+                  ]}
+                />
               </h1>
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl font-normal">
@@ -124,7 +136,7 @@ export default function LandingPage() {
               </p>
 
               {/* Instant Search Bar with Glassmorphic Specular Rim */}
-              <div className="relative group bg-slate-950/90 backdrop-blur-2xl border border-cyan-500/30 p-2.5 rounded-2xl shadow-2xl shadow-cyan-950/50 hover:border-cyan-400/60 transition-all">
+              <div className="relative group bg-slate-950/95 backdrop-blur-2xl border border-cyan-500/30 p-2.5 rounded-2xl shadow-2xl shadow-cyan-950/50 hover:border-cyan-400/60 transition-all">
                 <div className="pointer-events-none absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-cyan-500/20 via-blue-500/10 to-emerald-500/20 blur opacity-40 group-hover:opacity-75 transition duration-500" />
                 <form onSubmit={handleSearchSubmit} className="relative z-10 flex flex-col sm:flex-row gap-2">
                   <div className="flex-1 flex items-center px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2.5 text-xs">
@@ -136,6 +148,9 @@ export default function LandingPage() {
                       onChange={(e) => setSearchCity(e.target.value)}
                       className="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none"
                     />
+                    <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">
+                      ⌘K
+                    </span>
                   </div>
 
                   <div className="sm:w-36 flex items-center px-3 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 gap-2 text-xs">
@@ -199,7 +214,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column: 3D Interactive Spatial Digital Twin (7 cols) */}
-            <div className="lg:col-span-7 h-[480px] sm:h-[560px] lg:h-[620px] rounded-3xl overflow-hidden border border-cyan-500/30 bg-slate-950/90 shadow-2xl shadow-cyan-950/50 relative group">
+            <div className="lg:col-span-7 h-[480px] sm:h-[560px] lg:h-[620px] rounded-3xl overflow-hidden border border-cyan-500/30 bg-black/95 shadow-2xl shadow-cyan-950/50 relative group">
               <SpatialStage3D
                 onBuildingSelect={(_id, data) => {
                   setSelectedCityNode(data?.name ?? null);
@@ -208,7 +223,7 @@ export default function LandingPage() {
 
               {/* Interactive Inspector HUD in 3D Stage */}
               <div className="absolute bottom-4 right-4 z-20 pointer-events-auto">
-                <div className="flex items-center gap-2 p-2 rounded-2xl bg-slate-950/90 backdrop-blur-2xl border border-cyan-500/30 text-xs shadow-xl">
+                <div className="flex items-center gap-2 p-2 rounded-2xl bg-black/90 backdrop-blur-2xl border border-cyan-500/30 text-xs shadow-xl">
                   <div className="flex items-center gap-2 px-2">
                     <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
                     <span className="text-slate-300 text-[11px] font-mono">
@@ -231,7 +246,7 @@ export default function LandingPage() {
         {/* =========================================================================
             LIVE OPERATIONAL TELEMETRY RIBBON
         ========================================================================= */}
-        <section className="border-y border-slate-800/80 bg-slate-950/60 backdrop-blur-xl py-6">
+        <section className="border-y border-slate-800/80 bg-black/60 backdrop-blur-xl py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-800/80 text-center">
               <div className="pt-4 md:pt-0">
@@ -267,7 +282,7 @@ export default function LandingPage() {
         </section>
 
         {/* =========================================================================
-            INTERACTIVE 3D AUTOMATION SIMULATOR (Smart Lease, Yield, FIFO, AI Match)
+            INTERACTIVE 3D AUTOMATION SIMULATOR & CURSOR TERMINAL
         ========================================================================= */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center max-w-3xl mx-auto mb-14">
@@ -315,7 +330,7 @@ export default function LandingPage() {
           </div>
 
           {/* Simulator Active Canvas Screen */}
-          <GlassTiltCard maxTilt={4} className="p-6 sm:p-10 max-w-5xl mx-auto">
+          <GlassTiltCard maxTilt={4} className="p-6 sm:p-10 max-w-5xl mx-auto mb-10">
             {activeSimulatorTab === "lease" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center animate-in fade-in duration-300">
                 <div className="space-y-4">
@@ -345,7 +360,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* Interactive Lease Card Preview */}
-                <div className="p-6 rounded-2xl bg-slate-900/90 border border-cyan-500/30 space-y-4 font-mono text-xs shadow-xl">
+                <div className="p-6 rounded-2xl bg-black/95 border border-cyan-500/30 space-y-4 font-mono text-xs shadow-xl">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                     <span className="text-slate-400">LEASE AGREEMENT ID</span>
                     <span className="text-cyan-400 font-bold">#LS-2026-BLR-094</span>
@@ -408,7 +423,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* Interactive Yield Calculator Box */}
-                <div className="p-6 rounded-2xl bg-slate-900/90 border border-emerald-500/30 space-y-4 text-xs shadow-xl">
+                <div className="p-6 rounded-2xl bg-black/95 border border-emerald-500/30 space-y-4 text-xs shadow-xl">
                   <div className="text-slate-400 font-mono text-[11px] pb-2 border-b border-slate-800">
                     REAL-TIME PERFORMANCE PROJECTION
                   </div>
@@ -476,7 +491,7 @@ export default function LandingPage() {
 
                 {/* FIFO Visual Waterfall */}
                 <div className="space-y-2.5 font-mono text-xs">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-black border border-slate-800 flex items-center justify-between">
                     <div>
                       <span className="text-slate-400 block text-[10px]">JAN OBLIGATION (DUE ₹45,000)</span>
                       <span className="text-emerald-400 font-bold">
@@ -488,7 +503,7 @@ export default function LandingPage() {
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-black border border-slate-800 flex items-center justify-between">
                     <div>
                       <span className="text-slate-400 block text-[10px]">FEB OBLIGATION (DUE ₹45,000)</span>
                       <span className="text-cyan-400 font-bold">
@@ -542,7 +557,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* AI Explanation Card */}
-                <div className="p-6 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-4 text-xs shadow-xl">
+                <div className="p-6 rounded-2xl bg-black/95 border border-purple-500/30 space-y-4 text-xs shadow-xl">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                     <span className="text-slate-400">AI MATCH VECTOR</span>
                     <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold text-[10px]">
@@ -564,6 +579,11 @@ export default function LandingPage() {
               </div>
             )}
           </GlassTiltCard>
+
+          {/* Cursor-Style Code & Telemetry Terminal Drawer */}
+          <div className="max-w-5xl mx-auto">
+            <CursorTerminalPreview />
+          </div>
         </section>
 
         {/* =========================================================================
@@ -773,10 +793,10 @@ export default function LandingPage() {
                           alt={prop.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 text-[10px] font-bold text-cyan-300">
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-cyan-500/30 text-[10px] font-bold text-cyan-300">
                           VERIFIED DIGITAL TWIN
                         </div>
-                        <div className="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-slate-950/90 backdrop-blur-md text-white font-black text-sm">
+                        <div className="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-black/90 backdrop-blur-md text-white font-black text-sm">
                           ₹{Number(prop.price).toLocaleString("en-IN")}{" "}
                           <span className="text-[10px] font-normal text-slate-400">/ mo</span>
                         </div>
@@ -864,7 +884,7 @@ export default function LandingPage() {
               ].map((acc) => (
                 <div
                   key={acc.email}
-                  className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col justify-between space-y-3"
+                  className="p-4 rounded-xl bg-black/80 border border-slate-800 flex flex-col justify-between space-y-3"
                 >
                   <div>
                     <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-md border ${acc.color}`}>
