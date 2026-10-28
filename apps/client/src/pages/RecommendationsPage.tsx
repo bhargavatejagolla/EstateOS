@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { api } from "../lib/api.js";
 import type { RecommendationsResponse } from "@estateos/shared";
+import { getPropertyImageUrl, onImageError } from "../lib/image.js";
 import {
   Sparkles,
   MapPin,
@@ -137,8 +138,9 @@ export default function RecommendationsPage() {
               <div className="relative h-48 bg-slate-800 overflow-hidden">
                 {rec.imageUrl ? (
                   <img
-                    src={rec.imageUrl}
+                    src={getPropertyImageUrl(rec.imageUrl)}
                     alt={rec.title}
+                    onError={onImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 ) : (

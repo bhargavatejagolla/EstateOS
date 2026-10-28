@@ -78,7 +78,7 @@ export class PropertyController {
       throw new BadRequestError("No image file provided");
     }
 
-    const image = await PropertyService.addImage(id, req.file.buffer);
+    const image = await PropertyService.addImage(id, req.file.buffer, req.file.mimetype);
     res.status(201).json(image);
   }
 

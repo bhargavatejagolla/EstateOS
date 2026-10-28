@@ -277,7 +277,7 @@ export class PropertyService {
     });
   }
 
-  static async addImage(propertyId: string, fileBuffer: Buffer) {
+  static async addImage(propertyId: string, fileBuffer: Buffer, mimeType?: string) {
     const property = await prisma.property.findFirst({
       where: { id: propertyId, deletedAt: null },
       include: { images: true },
@@ -289,7 +289,8 @@ export class PropertyService {
 
     const { url, publicId } = await CloudinaryService.uploadBuffer(
       fileBuffer,
-      `estateos/properties/${propertyId}`
+      `estateos/properties/${propertyId}`,
+      mimeType
     );
 
     const isFirstImage = property.images.length === 0;

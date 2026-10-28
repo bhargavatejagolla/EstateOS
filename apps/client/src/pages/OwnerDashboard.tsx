@@ -42,6 +42,7 @@ import { FinancialTickerStream } from "../components/FinancialTickerStream.js";
 import { GlassTiltCard } from "../components/GlassTiltCard.js";
 import { KineticFluidRibbonBackground } from "../components/KineticFluidRibbonBackground.js";
 import { CustomCursor } from "../components/CustomCursor.js";
+import { getPropertyImageUrl, onImageError } from "../lib/image.js";
 
 interface Property {
   id: string;
@@ -891,7 +892,9 @@ export default function OwnerDashboard() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {effectiveProperties.map((property) => {
-                    const primaryImage = property.images?.find((img) => img.isPrimary)?.url || property.images?.[0]?.url;
+                    const primaryImage = getPropertyImageUrl(
+                      property.images?.find((img) => img.isPrimary)?.url || property.images?.[0]?.url
+                    );
 
                     return (
                       <GlassTiltCard key={property.id} maxTilt={4} className="rounded-3xl border border-white/10 bg-slate-950/90 shadow-xl overflow-hidden flex flex-col justify-between group">
@@ -902,6 +905,7 @@ export default function OwnerDashboard() {
                               <img
                                 src={primaryImage}
                                 alt={property.title}
+                                onError={onImageError}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
                             ) : (

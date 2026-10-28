@@ -8,6 +8,7 @@ import { GlassTiltCard } from "../components/GlassTiltCard.js";
 import { CustomCursor } from "../components/CustomCursor.js";
 import { KineticTextRotator } from "../components/KineticTextRotator.js";
 import { CursorTerminalPreview } from "../components/CursorTerminalPreview.js";
+import { getPropertyImageUrl, onImageError } from "../lib/image.js";
 import {
   Building2,
   ArrowRight,
@@ -789,8 +790,9 @@ export default function LandingPage() {
                     <Link to={`/properties/${prop.id}`} className="flex flex-col h-full group">
                       <div className="relative h-52 w-full overflow-hidden bg-slate-900">
                         <img
-                          src={prop.images?.[0]?.url ?? "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}
+                          src={getPropertyImageUrl(prop.images?.[0]?.url)}
                           alt={prop.title}
+                          onError={onImageError}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-cyan-500/30 text-[10px] font-bold text-cyan-300">

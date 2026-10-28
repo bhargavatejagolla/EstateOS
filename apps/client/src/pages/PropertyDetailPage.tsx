@@ -21,6 +21,7 @@ import {
   Home,
 } from "lucide-react";
 import { YieldWidget } from "../components/YieldWidget.js";
+import { getPropertyImageUrl, onImageError } from "../lib/image.js";
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +55,7 @@ export default function PropertyDetailPage() {
       setProperty(data);
       const firstImg = data.images?.[0];
       if (firstImg) {
-        setSelectedImage(firstImg.url);
+        setSelectedImage(getPropertyImageUrl(firstImg.url));
       }
     } catch {
       setError("Property not found or unavailable");
@@ -249,8 +250,9 @@ export default function PropertyDetailPage() {
             <div className="relative h-96 sm:h-[450px] bg-slate-950 rounded-3xl overflow-hidden border border-slate-800">
               {selectedImage ? (
                 <img
-                  src={selectedImage}
+                  src={getPropertyImageUrl(selectedImage)}
                   alt={property.title}
+                  onError={onImageError}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -277,12 +279,17 @@ export default function PropertyDetailPage() {
                 {property.images.map((img) => (
                   <button
                     key={img.id}
-                    onClick={() => setSelectedImage(img.url)}
+                    onClick={() => setSelectedImage(getPropertyImageUrl(img.url))}
                     className={`relative h-20 w-28 rounded-xl overflow-hidden shrink-0 border-2 transition ${
-                      selectedImage === img.url ? "border-emerald-500" : "border-slate-800 opacity-60 hover:opacity-100"
+                      selectedImage === getPropertyImageUrl(img.url) ? "border-emerald-500" : "border-slate-800 opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={img.url} alt="thumbnail" className="w-full h-full object-cover" />
+                    <img
+                      src={getPropertyImageUrl(img.url)}
+                      alt="thumbnail"
+                      onError={onImageError}
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>

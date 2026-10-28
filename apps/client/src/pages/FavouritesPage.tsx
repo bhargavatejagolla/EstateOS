@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api.js";
 import type { PropertyResponse } from "@estateos/shared";
+import { getPropertyImageUrl, onImageError } from "../lib/image.js";
 import { Heart, MapPin, Trash2, Bed, Bath, Square, Building2, ArrowLeft, Home } from "lucide-react";
 
 interface FavouriteItem {
@@ -95,10 +96,11 @@ export default function FavouritesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favourites.map(({ property }) => {
-            const primaryImage =
+            const primaryImage = getPropertyImageUrl(
               property.images?.find((img) => img.isPrimary)?.url ||
               property.images?.[0]?.url ||
-              null;
+              null
+            );
 
             return (
               <div
@@ -111,6 +113,7 @@ export default function FavouritesPage() {
                       <img
                         src={primaryImage}
                         alt={property.title}
+                        onError={onImageError}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (

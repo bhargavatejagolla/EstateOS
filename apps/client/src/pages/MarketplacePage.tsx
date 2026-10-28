@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { api } from "../lib/api.js";
 import { useAuth } from "../lib/auth.js";
+import { getPropertyImageUrl, onImageError } from "../lib/image.js";
 import type { PropertyResponse, PropertyListResponse } from "@estateos/shared";
 import {
   Search,
@@ -647,10 +648,11 @@ export default function MarketplacePage() {
                 properties[0];
               if (!activeProp) return null;
 
-              const activePrimaryImg =
+              const activePrimaryImg = getPropertyImageUrl(
                 activeProp.images.find((img) => img.isPrimary)?.url ||
                 activeProp.images[0]?.url ||
-                null;
+                null
+              );
 
               return (
                 <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
@@ -660,6 +662,7 @@ export default function MarketplacePage() {
                       <img
                         src={activePrimaryImg}
                         alt={activeProp.title}
+                        onError={onImageError}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -725,10 +728,11 @@ export default function MarketplacePage() {
         /* Standard Grid View Mode */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {properties.map((prop) => {
-            const primaryImage =
+            const primaryImage = getPropertyImageUrl(
               prop.images.find((img) => img.isPrimary)?.url ||
               prop.images[0]?.url ||
-              null;
+              null
+            );
 
             return (
               <div
@@ -741,6 +745,7 @@ export default function MarketplacePage() {
                     <img
                       src={primaryImage}
                       alt={prop.title}
+                      onError={onImageError}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
