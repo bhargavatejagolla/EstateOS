@@ -67,11 +67,15 @@ export default function NewPropertyPage() {
       // 2. Upload photo if selected
       if (selectedFile && created?.id) {
         const uploadForm = new FormData();
-        uploadForm.append("file", selectedFile);
-        await api(`/properties/${created.id}/images`, {
-          method: "POST",
-          body: uploadForm,
-        });
+        uploadForm.append("image", selectedFile);
+        try {
+          await api(`/properties/${created.id}/images`, {
+            method: "POST",
+            body: uploadForm,
+          });
+        } catch (uploadErr) {
+          console.warn("Property created successfully, but cover photo upload failed:", uploadErr);
+        }
       }
 
       navigate("/owner/dashboard");

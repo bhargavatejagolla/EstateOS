@@ -90,4 +90,46 @@ describe("Properties", () => {
     const res = await request(app).post("/api/properties").send(sample);
     expect(res.status).toBe(401);
   });
+
+  it("allows OWNER to upload property image with 'image' field", async () => {
+    const token = await makeOwner("uploader1@test.com");
+    const created = await request(app)
+      .post("/api/properties")
+      .set("Authorization", `Bearer ${token}`)
+      .send(sample);
+    const propertyId = created.body.id;
+
+    const res = await request(app)
+      .post(`/api/properties/${propertyId}/images`)
+      .set("Authorization", `Bearer ${token}`)
+      .attach("image", Buffer.from("fake-image-bytes"), {
+        filename: "test.jpg",
+        contentType: "image/jpeg",
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.url).toBeDefined();
+    expect(res.body.isPrimary).toBe(true);
+  });
+
+  it("allows OWNER to upload property image with 'file' field as fallback", async () => {
+    const token = await makeOwner("uploader2@test.com");
+    const created = await request(app)
+      .post("/api/properties")
+      .set("Authorization", `Bearer ${token}`)
+      .send(sample);
+    const propertyId = created.body.id;
+
+    const res = await request(app)
+      .post(`/api/properties/${propertyId}/images`)
+      .set("Authorization", `Bearer ${token}`)
+      .attach("file", Buffer.from("fake-image-bytes"), {
+        filename: "test.png",
+        contentType: "image/png",
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.url).toBeDefined();
+    expect(res.body.isPrimary).toBe(true);
+  });
 });

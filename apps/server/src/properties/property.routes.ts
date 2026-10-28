@@ -72,11 +72,23 @@ propertyRouter.delete(
 );
 
 // Upload property image (Owner with ownership check)
+// Accepts "image", "file", or "photo" to prevent client-side field naming mismatches
 propertyRouter.post(
   "/:id/images",
   authenticate,
   authorizeOwnership,
-  upload.single("image"),
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "file", maxCount: 1 },
+    { name: "photo", maxCount: 1 },
+  ]),
+  (req, _res, next) => {
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    if (files) {
+      req.file = files["image"]?.[0] || files["file"]?.[0] || files["photo"]?.[0];
+    }
+    next();
+  },
   PropertyController.uploadImage
 );
 
