@@ -76,7 +76,7 @@ export default function RegisterPage() {
       if (formData.role === "OWNER") {
         navigate("/owner/dashboard");
       } else {
-        navigate("/marketplace");
+        navigate("/renter/dashboard");
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Registration failed. Please check your details.");

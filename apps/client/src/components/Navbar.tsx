@@ -182,6 +182,16 @@ export function Navbar() {
                 </Link>
               )}
 
+              {user.role === "TENANT" && (
+                <Link
+                  to="/tenant/dashboard"
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 transition"
+                >
+                  <CreditCard className="h-3.5 w-3.5" />
+                  <span>Tenant Portal</span>
+                </Link>
+              )}
+
               {/* User Identity Chip */}
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />

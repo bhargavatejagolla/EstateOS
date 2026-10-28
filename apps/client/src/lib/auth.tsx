@@ -5,8 +5,8 @@ import type { UserPublic, RegisterInput } from "@estateos/shared";
 interface AuthContextType {
   user: UserPublic | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (input: RegisterInput) => Promise<void>;
+  login: (email: string, password: string) => Promise<UserPublic>;
+  register: (input: RegisterInput) => Promise<UserPublic>;
   logout: () => Promise<void>;
 }
 
@@ -34,22 +34,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<UserPublic> => {
     const data = await api<{ user: UserPublic; accessToken: string }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
     setAccessToken(data.accessToken);
     setUser(data.user);
+    return data.user;
   };
 
-  const register = async (input: RegisterInput) => {
+  const register = async (input: RegisterInput): Promise<UserPublic> => {
     const data = await api<{ user: UserPublic; accessToken: string }>("/auth/register", {
       method: "POST",
       body: JSON.stringify(input),
     });
     setAccessToken(data.accessToken);
     setUser(data.user);
+    return data.user;
   };
 
   const logout = async () => {

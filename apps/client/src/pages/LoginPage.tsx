@@ -40,10 +40,21 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const loggedInUser = await login(email, password);
       const state = location.state as { from?: { pathname: string } } | null;
-      const from = state?.from?.pathname || "/owner/dashboard";
-      navigate(from, { replace: true });
+      let targetPath = state?.from?.pathname;
+
+      if (!targetPath || targetPath === "/login") {
+        if (loggedInUser.role === "TENANT") {
+          targetPath = "/tenant/dashboard";
+        } else if (loggedInUser.role === "RENTER") {
+          targetPath = "/renter/dashboard";
+        } else {
+          targetPath = "/owner/dashboard";
+        }
+      }
+
+      navigate(targetPath, { replace: true });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
@@ -51,10 +62,34 @@ export default function LoginPage() {
     }
   };
 
-  const setDemoAccount = (demoEmail: string, demoPass = "password123") => {
+
+  const handleInstantPersonaLogin = async (demoEmail: string, demoPass = "password123") => {
     setEmail(demoEmail);
     setPassword(demoPass);
     setError(null);
+    setLoading(true);
+
+    try {
+      const loggedInUser = await login(demoEmail, demoPass);
+      const state = location.state as { from?: { pathname: string } } | null;
+      let targetPath = state?.from?.pathname;
+
+      if (!targetPath || targetPath === "/login") {
+        if (loggedInUser.role === "TENANT") {
+          targetPath = "/tenant/dashboard";
+        } else if (loggedInUser.role === "RENTER") {
+          targetPath = "/renter/dashboard";
+        } else {
+          targetPath = "/owner/dashboard";
+        }
+      }
+
+      navigate(targetPath, { replace: true });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleQuickResetAndLogin = async () => {
@@ -157,37 +192,67 @@ export default function LoginPage() {
               </div>
 
               {/* Instant 1-Click Demo Account Quick-Fill Chips */}
-              <div className="mb-6 p-3 rounded-xl bg-black/60 border border-slate-800 space-y-2">
+              <div className="mb-6 p-3.5 rounded-xl bg-black/60 border border-slate-800 space-y-2.5">
                 <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
                   <span className="flex items-center gap-1.5 text-cyan-300">
                     <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-                    <span>Verified Test Personas:</span>
+                    <span>Verified Test Personas (Click to Load or Instant Sign In):</span>
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <button
                     type="button"
-                    onClick={() => setDemoAccount("bhargavatejagolla@gmail.com", "Anjibunny@123")}
-                    className="px-2 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 text-[11px] font-bold transition truncate cursor-pointer"
-                    title="BT (Owner)"
+                    onClick={() => handleInstantPersonaLogin("bhargavatejagolla@gmail.com", "Anjibunny@123")}
+                    className="px-2.5 py-2 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 text-[11px] font-bold transition flex items-center justify-between cursor-pointer group"
+                    title="Sign in as BT (Owner)"
                   >
-                    👑 BT (Owner)
+                    <span className="truncate">👑 BT (Owner)</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => setDemoAccount("owner8@lease.test", "password123")}
-                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 text-[11px] font-semibold transition truncate cursor-pointer"
-                    title="Owner 8"
+                    onClick={() => handleInstantPersonaLogin("priya@estateos.com", "password123")}
+                    className="px-2.5 py-2 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/40 text-[11px] font-bold transition flex items-center justify-between cursor-pointer group"
+                    title="Sign in as Priya Nair (Tenant - Active Lease)"
                   >
-                    👑 Owner 8
+                    <span className="truncate">🔑 Tenant (Priya)</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => setDemoAccount("tenant8@lease.test", "password123")}
-                    className="px-2 py-1.5 rounded-lg bg-slate-900/90 hover:bg-purple-500/20 text-slate-300 hover:text-purple-300 border border-slate-800 hover:border-purple-500/40 text-[11px] font-semibold transition truncate cursor-pointer"
-                    title="Tenant 8"
+                    onClick={() => handleInstantPersonaLogin("tenant8@lease.test", "password123")}
+                    className="px-2.5 py-2 rounded-lg bg-slate-900/90 hover:bg-purple-500/20 text-slate-300 hover:text-purple-300 border border-slate-800 hover:border-purple-500/40 text-[11px] font-semibold transition flex items-center justify-between cursor-pointer group"
+                    title="Sign in as Tenant 8"
                   >
-                    🔑 Tenant 8
+                    <span className="truncate">🔑 Tenant 8</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleInstantPersonaLogin("rajesh@estateos.com", "password123")}
+                    className="px-2.5 py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold transition flex items-center justify-between cursor-pointer group"
+                    title="Sign in as Rajesh Kumar (Owner)"
+                  >
+                    <span className="truncate">👑 Rajesh (Owner)</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleInstantPersonaLogin("owner8@lease.test", "password123")}
+                    className="px-2.5 py-2 rounded-lg bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 text-[11px] font-semibold transition flex items-center justify-between cursor-pointer group"
+                    title="Sign in as Owner 8"
+                  >
+                    <span className="truncate">👑 Owner 8</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleInstantPersonaLogin("arjun@estateos.com", "password123")}
+                    className="px-2.5 py-2 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/40 text-[11px] font-semibold transition flex items-center justify-between cursor-pointer group"
+                    title="Sign in as Arjun Mehta (Renter)"
+                  >
+                    <span className="truncate">🔍 Renter (Arjun)</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
                   </button>
                 </div>
               </div>
