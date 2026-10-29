@@ -31,6 +31,8 @@ if (!fs.existsSync(uploadsDir)) {
 
 export const app: Express = express();
 
+const allowedOrigins = env.CLIENT_ORIGIN.split(",").map((s) => s.trim());
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -38,7 +40,20 @@ app.use(
 );
 app.use(
   cors({
-    origin: env.CLIENT_ORIGIN,
+    origin: (origin, callback) => {
+      // Allow server-to-server, mobile, or direct requests without origin
+      if (!origin) return callback(null, true);
+      // Allow configured origins, Vercel preview/production domains, and local dev
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("localhost") ||
+        origin.includes("127.0.0.1")
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );

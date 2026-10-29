@@ -1,3 +1,5 @@
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+
 let accessToken: string | null = null;
 
 export const setAccessToken = (token: string | null) => {
@@ -8,6 +10,7 @@ export const getAccessToken = () => accessToken;
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   const normalizedPath = path.startsWith("/api") ? path : `/api${path.startsWith("/") ? "" : "/"}${path}`;
+  const requestUrl = API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
 
   const headers = new Headers(options.headers);
   if (accessToken) {
@@ -17,39 +20,40 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(normalizedPath, {
+  const res = await fetch(requestUrl, {
     ...options,
     headers,
     credentials: "include",
   });
 
-let refreshPromise: Promise<string | null> | null = null;
+  let refreshPromise: Promise<string | null> | null = null;
 
-async function requestTokenRefresh(): Promise<string | null> {
-  if (refreshPromise) return refreshPromise;
+  async function requestTokenRefresh(): Promise<string | null> {
+    if (refreshPromise) return refreshPromise;
 
-  refreshPromise = (async () => {
-    try {
-      const refreshRes = await fetch("/api/auth/refresh", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (refreshRes.ok) {
-        const data = await refreshRes.json();
-        setAccessToken(data.accessToken);
-        return data.accessToken as string;
+    refreshPromise = (async () => {
+      try {
+        const refreshUrl = API_BASE_URL ? `${API_BASE_URL}/api/auth/refresh` : "/api/auth/refresh";
+        const refreshRes = await fetch(refreshUrl, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (refreshRes.ok) {
+          const data = await refreshRes.json();
+          setAccessToken(data.accessToken);
+          return data.accessToken as string;
+        }
+      } catch {
+        // Refresh failed
+      } finally {
+        refreshPromise = null;
       }
-    } catch {
-      // Refresh failed
-    } finally {
-      refreshPromise = null;
-    }
-    setAccessToken(null);
-    return null;
-  })();
+      setAccessToken(null);
+      return null;
+    })();
 
-  return refreshPromise;
-}
+    return refreshPromise;
+  }
 
   if (
     res.status === 401 &&
@@ -62,7 +66,7 @@ async function requestTokenRefresh(): Promise<string | null> {
 
     if (newAccessToken) {
       headers.set("Authorization", `Bearer ${newAccessToken}`);
-      const retryRes = await fetch(normalizedPath, {
+      const retryRes = await fetch(requestUrl, {
         ...options,
         headers,
         credentials: "include",
