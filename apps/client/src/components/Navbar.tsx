@@ -18,13 +18,35 @@ import {
 } from "lucide-react";
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, switchUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
+  };
+
+  const handleSwitchToTenant = () => {
+    switchUser({
+      id: "usr_priya_tenant",
+      name: "Priya Nair",
+      email: "priya@estateos.com",
+      role: "TENANT",
+      phone: "+91 98765 43211",
+    });
+    navigate("/tenant/dashboard");
+  };
+
+  const handleSwitchToOwner = () => {
+    switchUser({
+      id: "usr_bt_owner",
+      name: "Bhargava Teja",
+      email: "bhargavatejagolla@gmail.com",
+      role: "OWNER",
+      phone: "+91 98765 43210",
+    });
+    navigate("/owner/dashboard");
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -202,22 +224,16 @@ export function Navbar() {
 
                 {user.role === "OWNER" ? (
                   <button
-                    onClick={async () => {
-                      await logout();
-                      navigate("/login");
-                    }}
-                    className="ml-1 px-2 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                    onClick={handleSwitchToTenant}
+                    className="ml-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/35 text-purple-300 border border-purple-500/40 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
                     title="Switch Account to Tenant"
                   >
                     <span>🔑 Switch to Tenant</span>
                   </button>
                 ) : (
                   <button
-                    onClick={async () => {
-                      await logout();
-                      navigate("/login");
-                    }}
-                    className="ml-1 px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                    onClick={handleSwitchToOwner}
+                    className="ml-1 px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/35 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
                     title="Switch Account to Owner"
                   >
                     <span>👑 Switch to Owner</span>

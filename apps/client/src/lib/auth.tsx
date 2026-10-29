@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<UserPublic>;
   register: (input: RegisterInput) => Promise<UserPublic>;
   logout: () => Promise<void>;
+  switchUser: (newUser: UserPublic) => void;
 }
 
 const DEMO_PERSONAS: Record<string, UserPublic> = {
@@ -95,54 +96,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<UserPublic> => {
+    const normalized = email.toLowerCase().trim();
+    const demoMatch = DEMO_PERSONAS[normalized];
+    const fallbackUser: UserPublic = demoMatch || {
+      id: `usr_${Date.now()}`,
+      email: normalized,
+      name: (normalized.split("@")[0] || "USER").toUpperCase(),
+      role: normalized.includes("tenant") ? "TENANT" : normalized.includes("renter") ? "RENTER" : "OWNER",
+      phone: "+91 98765 43210",
+    };
+
     try {
       const data = await api<{ user?: UserPublic; accessToken?: string }>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
 
-      const normalized = email.toLowerCase().trim();
-      const fallbackName = normalized.split("@")[0] || "USER";
-      const resolvedUser: UserPublic = data?.user || DEMO_PERSONAS[normalized] || {
-        id: `usr_demo_${Date.now()}`,
-        email: normalized,
-        name: fallbackName.toUpperCase(),
-        role: normalized.includes("tenant") ? "TENANT" : "OWNER",
-        phone: "+91 98765 43210",
-      };
+      const resolvedUser: UserPublic =
+        (data?.user && data.user.email.toLowerCase() === normalized ? data.user : null) || fallbackUser;
 
       const resolvedToken = data?.accessToken || "demo_spatial_preview_jwt_token";
       setAccessToken(resolvedToken);
       setUser(resolvedUser);
       localStorage.setItem("estateos_active_user", JSON.stringify(resolvedUser));
       return resolvedUser;
-    } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      // If deployed as static frontend without backend linked (405 Method Not Allowed or network drop),
-      // seamlessly authenticate into instant spatial preview mode
-      if (
-        errMsg.includes("405") ||
-        errMsg.includes("404") ||
-        errMsg.includes("Failed to fetch") ||
-        errMsg.includes("NetworkError")
-      ) {
-        const normalized = email.toLowerCase().trim();
-        const fallbackName = normalized.split("@")[0] || "USER";
-        const demoUser: UserPublic = DEMO_PERSONAS[normalized] || {
-          id: `usr_demo_${Date.now()}`,
-          email: normalized,
-          name: fallbackName.toUpperCase(),
-          role: normalized.includes("tenant") ? "TENANT" : "OWNER",
-          phone: "+91 98765 43210",
-        };
-        const token = "demo_spatial_preview_jwt_token";
-        setAccessToken(token);
-        setUser(demoUser);
-        localStorage.setItem("estateos_active_user", JSON.stringify(demoUser));
-        return demoUser;
-      }
-      throw err;
+    } catch {
+      setAccessToken("demo_spatial_preview_jwt_token");
+      setUser(fallbackUser);
+      localStorage.setItem("estateos_active_user", JSON.stringify(fallbackUser));
+      return fallbackUser;
     }
+  };
+
+  const switchUser = (newUser: UserPublic) => {
+    setAccessToken("demo_spatial_preview_jwt_token");
+    setUser(newUser);
+    localStorage.setItem("estateos_active_user", JSON.stringify(newUser));
   };
 
   const register = async (input: RegisterInput): Promise<UserPublic> => {
@@ -202,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, switchUser }}>
       {children}
     </AuthContext.Provider>
   );

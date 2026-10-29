@@ -131,7 +131,23 @@ api.delete = <T>(path: string, options: RequestInit = {}): Promise<T> =>
   api<T>(path, { ...options, method: "DELETE" });
 
 function getStaticPreviewMock(path: string, method: string, options?: RequestInit): unknown | null {
-  if (path.includes("/auth/login") || path.includes("/auth/register") || path.includes("/auth/refresh")) {
+  if (path.includes("/auth/refresh")) {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("estateos_active_user") : null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return {
+          user: parsed,
+          accessToken: "demo_spatial_preview_jwt_token",
+        };
+      } catch {
+        // ignore
+      }
+    }
+    return null;
+  }
+
+  if (path.includes("/auth/login") || path.includes("/auth/register")) {
     let email = "";
     let role = "";
     if (typeof options?.body === "string") {

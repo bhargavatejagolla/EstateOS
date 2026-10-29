@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuth } from "../lib/auth.js";
 import { api } from "../lib/api.js";
 import { BiometricCyberEye } from "../components/BiometricCyberEye.js";
@@ -22,7 +22,6 @@ import {
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,21 +40,15 @@ export default function LoginPage() {
 
     try {
       const loggedInUser = await login(email, password);
-      const userRole = loggedInUser?.role || (email.toLowerCase().includes("tenant") ? "TENANT" : "OWNER");
-      const state = location.state as { from?: { pathname: string } } | null;
-      let targetPath = state?.from?.pathname;
+      const userRole = loggedInUser?.role || (email.toLowerCase().includes("tenant") ? "TENANT" : email.toLowerCase().includes("renter") ? "RENTER" : "OWNER");
 
-      if (!targetPath || targetPath === "/login") {
-        if (userRole === "TENANT") {
-          targetPath = "/tenant/dashboard";
-        } else if (userRole === "RENTER") {
-          targetPath = "/renter/dashboard";
-        } else {
-          targetPath = "/owner/dashboard";
-        }
+      if (userRole === "TENANT") {
+        navigate("/tenant/dashboard", { replace: true });
+      } else if (userRole === "RENTER") {
+        navigate("/renter/dashboard", { replace: true });
+      } else {
+        navigate("/owner/dashboard", { replace: true });
       }
-
-      navigate(targetPath, { replace: true });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
@@ -72,21 +65,15 @@ export default function LoginPage() {
 
     try {
       const loggedInUser = await login(demoEmail, demoPass);
-      const userRole = loggedInUser?.role || (demoEmail.toLowerCase().includes("tenant") ? "TENANT" : "OWNER");
-      const state = location.state as { from?: { pathname: string } } | null;
-      let targetPath = state?.from?.pathname;
+      const userRole = loggedInUser?.role || (demoEmail.toLowerCase().includes("tenant") ? "TENANT" : demoEmail.toLowerCase().includes("renter") ? "RENTER" : "OWNER");
 
-      if (!targetPath || targetPath === "/login") {
-        if (userRole === "TENANT") {
-          targetPath = "/tenant/dashboard";
-        } else if (userRole === "RENTER") {
-          targetPath = "/renter/dashboard";
-        } else {
-          targetPath = "/owner/dashboard";
-        }
+      if (userRole === "TENANT") {
+        navigate("/tenant/dashboard", { replace: true });
+      } else if (userRole === "RENTER") {
+        navigate("/renter/dashboard", { replace: true });
+      } else {
+        navigate("/owner/dashboard", { replace: true });
       }
-
-      navigate(targetPath, { replace: true });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
