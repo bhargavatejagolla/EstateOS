@@ -96,14 +96,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<UserPublic> => {
     try {
-      const data = await api<{ user: UserPublic; accessToken: string }>("/auth/login", {
+      const data = await api<{ user?: UserPublic; accessToken?: string }>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      setAccessToken(data.accessToken);
-      setUser(data.user);
-      localStorage.setItem("estateos_active_user", JSON.stringify(data.user));
-      return data.user;
+
+      const normalized = email.toLowerCase().trim();
+      const fallbackName = normalized.split("@")[0] || "USER";
+      const resolvedUser: UserPublic = data?.user || DEMO_PERSONAS[normalized] || {
+        id: `usr_demo_${Date.now()}`,
+        email: normalized,
+        name: fallbackName.toUpperCase(),
+        role: normalized.includes("tenant") ? "TENANT" : "OWNER",
+        phone: "+91 98765 43210",
+      };
+
+      const resolvedToken = data?.accessToken || "demo_spatial_preview_jwt_token";
+      setAccessToken(resolvedToken);
+      setUser(resolvedUser);
+      localStorage.setItem("estateos_active_user", JSON.stringify(resolvedUser));
+      return resolvedUser;
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
       // If deployed as static frontend without backend linked (405 Method Not Allowed or network drop),
@@ -135,14 +147,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (input: RegisterInput): Promise<UserPublic> => {
     try {
-      const data = await api<{ user: UserPublic; accessToken: string }>("/auth/register", {
+      const data = await api<{ user?: UserPublic; accessToken?: string }>("/auth/register", {
         method: "POST",
         body: JSON.stringify(input),
       });
-      setAccessToken(data.accessToken);
-      setUser(data.user);
-      localStorage.setItem("estateos_active_user", JSON.stringify(data.user));
-      return data.user;
+
+      const demoUser: UserPublic = data?.user || {
+        id: `usr_reg_${Date.now()}`,
+        email: input.email,
+        name: input.name,
+        role: input.role,
+        phone: input.phone || "+91 98765 43210",
+      };
+      const token = data?.accessToken || "demo_spatial_preview_jwt_token";
+      setAccessToken(token);
+      setUser(demoUser);
+      localStorage.setItem("estateos_active_user", JSON.stringify(demoUser));
+      return demoUser;
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
       if (

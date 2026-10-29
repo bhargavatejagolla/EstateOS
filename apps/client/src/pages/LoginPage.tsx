@@ -41,13 +41,14 @@ export default function LoginPage() {
 
     try {
       const loggedInUser = await login(email, password);
+      const userRole = loggedInUser?.role || (email.toLowerCase().includes("tenant") ? "TENANT" : "OWNER");
       const state = location.state as { from?: { pathname: string } } | null;
       let targetPath = state?.from?.pathname;
 
       if (!targetPath || targetPath === "/login") {
-        if (loggedInUser.role === "TENANT") {
+        if (userRole === "TENANT") {
           targetPath = "/tenant/dashboard";
-        } else if (loggedInUser.role === "RENTER") {
+        } else if (userRole === "RENTER") {
           targetPath = "/renter/dashboard";
         } else {
           targetPath = "/owner/dashboard";
@@ -71,13 +72,14 @@ export default function LoginPage() {
 
     try {
       const loggedInUser = await login(demoEmail, demoPass);
+      const userRole = loggedInUser?.role || (demoEmail.toLowerCase().includes("tenant") ? "TENANT" : "OWNER");
       const state = location.state as { from?: { pathname: string } } | null;
       let targetPath = state?.from?.pathname;
 
       if (!targetPath || targetPath === "/login") {
-        if (loggedInUser.role === "TENANT") {
+        if (userRole === "TENANT") {
           targetPath = "/tenant/dashboard";
-        } else if (loggedInUser.role === "RENTER") {
+        } else if (userRole === "RENTER") {
           targetPath = "/renter/dashboard";
         } else {
           targetPath = "/owner/dashboard";

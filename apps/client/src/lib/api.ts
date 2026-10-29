@@ -131,6 +131,25 @@ api.delete = <T>(path: string, options: RequestInit = {}): Promise<T> =>
   api<T>(path, { ...options, method: "DELETE" });
 
 function getStaticPreviewMock(path: string, method: string): unknown | null {
+  if (path.includes("/auth/login") || path.includes("/auth/register") || path.includes("/auth/refresh")) {
+    const isTenant = path.toLowerCase().includes("tenant") || path.toLowerCase().includes("priya");
+    const demoUser = {
+      id: isTenant ? "usr_priya_tenant" : "usr_bt_owner",
+      name: isTenant ? "Priya Nair" : "Bhargava Teja",
+      email: isTenant ? "priya@estateos.com" : "bhargavatejagolla@gmail.com",
+      role: isTenant ? ("TENANT" as const) : ("OWNER" as const),
+      phone: "+91 98765 43210",
+    };
+    return {
+      user: demoUser,
+      accessToken: "demo_spatial_preview_jwt_token",
+    };
+  }
+
+  if (path.includes("/auth/reset-password")) {
+    return { message: "Password updated successfully" };
+  }
+
   const isWrite = ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase());
   if (isWrite) {
     return { success: true, message: "Action processed in preview node" };
