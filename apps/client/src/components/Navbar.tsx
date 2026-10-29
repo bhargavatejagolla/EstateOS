@@ -24,7 +24,7 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/");
+    navigate("/login");
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -192,16 +192,42 @@ export function Navbar() {
                 </Link>
               )}
 
-              {/* User Identity Chip */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              {/* User Identity Chip & Instant Switcher */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-white/10 text-xs">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse ml-2" />
                 <span className="font-semibold text-white max-w-[90px] truncate">{user.name}</span>
-                <span className="text-slate-500 text-[10px]">({user.role})</span>
+                <span className="text-cyan-400 text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10">
+                  {user.role}
+                </span>
+
+                {user.role === "OWNER" ? (
+                  <button
+                    onClick={async () => {
+                      await logout();
+                      navigate("/login");
+                    }}
+                    className="ml-1 px-2 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                    title="Switch Account to Tenant"
+                  >
+                    <span>🔑 Switch to Tenant</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      await logout();
+                      navigate("/login");
+                    }}
+                    className="ml-1 px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                    title="Switch Account to Owner"
+                  >
+                    <span>👑 Switch to Owner</span>
+                  </button>
+                )}
               </div>
 
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition border border-transparent hover:border-rose-500/20"
+                className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition border border-transparent hover:border-rose-500/20 cursor-pointer"
                 title="Sign Out"
               >
                 <LogOut className="h-3.5 w-3.5" />

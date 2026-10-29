@@ -87,7 +87,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
 
   if (!res.ok) {
     if (res.status === 405) {
-      const fallback = getStaticPreviewMock(normalizedPath, options.method || "GET");
+      const fallback = getStaticPreviewMock(normalizedPath, options.method || "GET", options);
       if (fallback !== null) {
         return fallback as T;
       }
@@ -130,18 +130,82 @@ api.patch = <T>(path: string, data?: unknown, options: RequestInit = {}): Promis
 api.delete = <T>(path: string, options: RequestInit = {}): Promise<T> =>
   api<T>(path, { ...options, method: "DELETE" });
 
-function getStaticPreviewMock(path: string, method: string): unknown | null {
+function getStaticPreviewMock(path: string, method: string, options?: RequestInit): unknown | null {
   if (path.includes("/auth/login") || path.includes("/auth/register") || path.includes("/auth/refresh")) {
-    const isTenant = path.toLowerCase().includes("tenant") || path.toLowerCase().includes("priya");
-    const demoUser = {
-      id: isTenant ? "usr_priya_tenant" : "usr_bt_owner",
-      name: isTenant ? "Priya Nair" : "Bhargava Teja",
-      email: isTenant ? "priya@estateos.com" : "bhargavatejagolla@gmail.com",
-      role: isTenant ? ("TENANT" as const) : ("OWNER" as const),
-      phone: "+91 98765 43210",
+    let email = "";
+    let role = "";
+    if (typeof options?.body === "string") {
+      try {
+        const parsed = JSON.parse(options.body);
+        email = (parsed.email || "").toLowerCase().trim();
+        role = parsed.role || "";
+      } catch {
+        // ignore
+      }
+    }
+
+    const DEMO_USERS: Record<string, { id: string; name: string; email: string; role: "OWNER" | "TENANT" | "RENTER"; phone: string }> = {
+      "priya@estateos.com": {
+        id: "usr_priya_tenant",
+        name: "Priya Nair",
+        email: "priya@estateos.com",
+        role: "TENANT",
+        phone: "+91 98765 43211",
+      },
+      "tenant8@lease.test": {
+        id: "usr_tenant8",
+        name: "Tenant 8",
+        email: "tenant8@lease.test",
+        role: "TENANT",
+        phone: "+91 98765 43212",
+      },
+      "rajesh@estateos.com": {
+        id: "usr_rajesh_owner",
+        name: "Rajesh Kumar",
+        email: "rajesh@estateos.com",
+        role: "OWNER",
+        phone: "+91 98765 43213",
+      },
+      "owner8@lease.test": {
+        id: "usr_owner8",
+        name: "Owner 8",
+        email: "owner8@lease.test",
+        role: "OWNER",
+        phone: "+91 98765 43214",
+      },
+      "arjun@estateos.com": {
+        id: "usr_arjun_renter",
+        name: "Arjun Mehta",
+        email: "arjun@estateos.com",
+        role: "RENTER",
+        phone: "+91 98765 43215",
+      },
+      "bhargavatejagolla@gmail.com": {
+        id: "usr_bt_owner",
+        name: "Bhargava Teja",
+        email: "bhargavatejagolla@gmail.com",
+        role: "OWNER",
+        phone: "+91 98765 43210",
+      },
     };
+
+    let user = DEMO_USERS[email];
+    if (!user) {
+      const isTenant = email.includes("tenant") || role === "TENANT";
+      const isRenter = email.includes("renter") || role === "RENTER";
+      const userRole: "OWNER" | "TENANT" | "RENTER" = isTenant ? "TENANT" : isRenter ? "RENTER" : "OWNER";
+      const fallbackName = (email.split("@")[0] || "DEMO USER").toUpperCase();
+      user = {
+        id: `usr_${Date.now()}`,
+        name: fallbackName,
+        email: email || "demo@estateos.com",
+        role: userRole,
+        phone: "+91 98765 43210",
+      };
+    }
+
     return {
-      user: demoUser,
+      user,
       accessToken: "demo_spatial_preview_jwt_token",
     };
   }
