@@ -264,36 +264,44 @@ pnpm install
 ```
 
 ### 3. Configure Server Environment
-Create your `.env` file inside `apps/server/.env`:
-```env
-# Database Connection String
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/estateos?schema=public"
-
-# Authentication Secrets
-JWT_SECRET="your-super-secure-estateos-jwt-secret-key-32-chars-min"
-JWT_EXPIRES_IN="7d"
-
-# Server Port
-PORT=5000
-NODE_ENV="development"
+Create your `.env` file inside `apps/server/.env` (or copy from `apps/server/.env.example`):
+```bash
+cp apps/server/.env.example apps/server/.env
 ```
 
-### 4. Run Prisma Migrations & Seed Data
+Your `apps/server/.env` should contain:
+```env
+PORT=4000
+NODE_ENV="development"
+CLIENT_ORIGIN="http://localhost:5173"
+
+# PostgreSQL connection string (e.g. free Neon.tech, Supabase, or local PostgreSQL)
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/estateos?schema=public"
+DATABASE_URL_TEST="postgresql://postgres:postgres@localhost:5432/estateos?schema=public"
+
+# Authentication Secrets (min 16 characters)
+JWT_ACCESS_SECRET="estateos_super_secure_access_secret_123456"
+JWT_REFRESH_SECRET="estateos_super_secure_refresh_secret_123456"
+JWT_ACCESS_EXPIRY="15m"
+JWT_REFRESH_EXPIRY="7d"
+```
+
+### 4. Run Prisma Database Setup & Seed Data
 ```bash
 # Generate the Prisma Client
 pnpm --filter server prisma:generate
 
-# Apply Database Migrations
-pnpm --filter server prisma:migrate
+# Sync schema to your database (creates all tables)
+pnpm --filter server prisma:push
 
-# Seed Database with Properties, Units & Test Accounts
-pnpm --filter server seed
+# Seed Database with sample properties, leases, obligations, and test accounts
+pnpm seed
 ```
 
 ### 5. Launch Development Servers
 Run the full-stack development environment simultaneously:
 ```bash
-# Terminal 1: Launch Backend API (Port 5000)
+# Terminal 1: Launch Backend API (Port 4000)
 pnpm dev:server
 
 # Terminal 2: Launch Frontend Client (Port 5173)
@@ -307,12 +315,16 @@ Open your browser and navigate to:
 
 ## 🔑 One-Click Demo Credentials
 
-To explore EstateOS without filling out manual forms, use the **One-Click Demo Chips** built directly into the login and registration portals:
+To explore EstateOS without filling out manual forms, use the **1-Click Verified Persona Chips** built directly into the login screen:
 
 | Role | Name | Email | Password | Pre-loaded Access |
 | :--- | :--- | :--- | :--- | :--- |
-| **👑 Landlord / Owner** | `Vikram Malhotra` | `vikram@estateos.test` | `Password123!` | Portfolio Dashboard, Yield Metrics, Unit Creation |
-| **🔑 Tenant / Resident** | `Sneha Roy` | `sneha@estateos.test` | `Password123!` | Active Penthouse Lease, Escrow Ledger, Maintenance |
+| **👑 Landlord / Owner** | `Rajesh Kumar` | `rajesh@estateos.com` | `password123` | Full Portfolio Ledger, 3D Twin View, Unit Management |
+| **🔑 Tenant / Resident** | `Priya Nair` | `priya@estateos.com` | `password123` | Active Penthouse Lease, Monthly Rent Schedule, Maintenance |
+| **🔍 Verified Renter** | `Arjun Mehta` | `arjun@estateos.com` | `password123` | Marketplace Exploration, Tour Bookings, Inquiries |
+| **👑 BT (Owner)** | `Bhargav Teja` | `bhargavatejagolla@gmail.com` | `Anjibunny@123` | Super-Owner Administration & Live Ledger |
+| **🔑 Tenant 8** | `Tenant 8` | `tenant8@lease.test` | `password123` | On-demand test tenant persona |
+| **👑 Owner 8** | `Owner 8` | `owner8@lease.test` | `password123` | On-demand test owner persona |
 
 ---
 
