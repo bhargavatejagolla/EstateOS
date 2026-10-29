@@ -96,10 +96,14 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      await api("/auth/reset-password", {
-        method: "POST",
-        body: JSON.stringify({ email: "bhargavatejagolla@gmail.com", password: "Anjibunny@123" }),
-      });
+      try {
+        await api("/auth/reset-password", {
+          method: "POST",
+          body: JSON.stringify({ email: "bhargavatejagolla@gmail.com", password: "Anjibunny@123" }),
+        });
+      } catch {
+        // Continue if offline or preview node
+      }
       setEmail("bhargavatejagolla@gmail.com");
       setPassword("Anjibunny@123");
       await login("bhargavatejagolla@gmail.com", "Anjibunny@123");

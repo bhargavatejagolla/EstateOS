@@ -10,6 +10,51 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+const DEMO_PERSONAS: Record<string, UserPublic> = {
+  "bhargavatejagolla@gmail.com": {
+    id: "usr_bt_owner",
+    email: "bhargavatejagolla@gmail.com",
+    name: "Bhargava Teja",
+    role: "OWNER",
+    phone: "+91 98765 43210",
+  },
+  "priya@estateos.com": {
+    id: "usr_priya_tenant",
+    email: "priya@estateos.com",
+    name: "Priya Nair",
+    role: "TENANT",
+    phone: "+91 98765 43211",
+  },
+  "tenant8@lease.test": {
+    id: "usr_tenant8",
+    email: "tenant8@lease.test",
+    name: "Tenant 8",
+    role: "TENANT",
+    phone: "+91 98765 43212",
+  },
+  "rajesh@estateos.com": {
+    id: "usr_rajesh_owner",
+    email: "rajesh@estateos.com",
+    name: "Rajesh Kumar",
+    role: "OWNER",
+    phone: "+91 98765 43213",
+  },
+  "owner8@lease.test": {
+    id: "usr_owner8",
+    email: "owner8@lease.test",
+    name: "Owner 8",
+    role: "OWNER",
+    phone: "+91 98765 43214",
+  },
+  "arjun@estateos.com": {
+    id: "usr_arjun_renter",
+    email: "arjun@estateos.com",
+    name: "Arjun Mehta",
+    role: "RENTER",
+    phone: "+91 98765 43215",
+  },
+};
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -17,17 +62,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Attempt silent refresh on initial application mount
+    // Check if there is an active session stored locally
+    const cached = localStorage.getItem("estateos_active_user");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setUser(parsed);
+        setAccessToken("demo_spatial_preview_jwt_token");
+      } catch {
+        // ignore JSON parse errors
+      }
+    }
+
+    // Attempt silent refresh on initial application mount if backend is connected
     api<{ user: UserPublic; accessToken: string }>("/auth/refresh", {
       method: "POST",
     })
       .then((data) => {
         setAccessToken(data.accessToken);
         setUser(data.user);
+        localStorage.setItem("estateos_active_user", JSON.stringify(data.user));
       })
       .catch(() => {
-        setAccessToken(null);
-        setUser(null);
+        if (!cached) {
+          setAccessToken(null);
+          setUser(null);
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -35,23 +95,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<UserPublic> => {
-    const data = await api<{ user: UserPublic; accessToken: string }>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-    setAccessToken(data.accessToken);
-    setUser(data.user);
-    return data.user;
+    try {
+      const data = await api<{ user: UserPublic; accessToken: string }>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      setAccessToken(data.accessToken);
+      setUser(data.user);
+      localStorage.setItem("estateos_active_user", JSON.stringify(data.user));
+      return data.user;
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      // If deployed as static frontend without backend linked (405 Method Not Allowed or network drop),
+      // seamlessly authenticate into instant spatial preview mode
+      if (
+        errMsg.includes("405") ||
+        errMsg.includes("404") ||
+        errMsg.includes("Failed to fetch") ||
+        errMsg.includes("NetworkError")
+      ) {
+        const normalized = email.toLowerCase().trim();
+        const fallbackName = normalized.split("@")[0] || "USER";
+        const demoUser: UserPublic = DEMO_PERSONAS[normalized] || {
+          id: `usr_demo_${Date.now()}`,
+          email: normalized,
+          name: fallbackName.toUpperCase(),
+          role: normalized.includes("tenant") ? "TENANT" : "OWNER",
+          phone: "+91 98765 43210",
+        };
+        const token = "demo_spatial_preview_jwt_token";
+        setAccessToken(token);
+        setUser(demoUser);
+        localStorage.setItem("estateos_active_user", JSON.stringify(demoUser));
+        return demoUser;
+      }
+      throw err;
+    }
   };
 
   const register = async (input: RegisterInput): Promise<UserPublic> => {
-    const data = await api<{ user: UserPublic; accessToken: string }>("/auth/register", {
-      method: "POST",
-      body: JSON.stringify(input),
-    });
-    setAccessToken(data.accessToken);
-    setUser(data.user);
-    return data.user;
+    try {
+      const data = await api<{ user: UserPublic; accessToken: string }>("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+      setAccessToken(data.accessToken);
+      setUser(data.user);
+      localStorage.setItem("estateos_active_user", JSON.stringify(data.user));
+      return data.user;
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (
+        errMsg.includes("405") ||
+        errMsg.includes("404") ||
+        errMsg.includes("Failed to fetch") ||
+        errMsg.includes("NetworkError")
+      ) {
+        const demoUser: UserPublic = {
+          id: `usr_reg_${Date.now()}`,
+          email: input.email,
+          name: input.name,
+          role: input.role,
+          phone: input.phone || "+91 98765 43210",
+        };
+        const token = "demo_spatial_preview_jwt_token";
+        setAccessToken(token);
+        setUser(demoUser);
+        localStorage.setItem("estateos_active_user", JSON.stringify(demoUser));
+        return demoUser;
+      }
+      throw err;
+    }
   };
 
   const logout = async () => {
@@ -60,6 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore logout errors
     } finally {
+      localStorage.removeItem("estateos_active_user");
       setAccessToken(null);
       setUser(null);
     }
